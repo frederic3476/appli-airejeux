@@ -6,13 +6,13 @@
     </ion-nav-buttons>
     <ion-nav-buttons side="primary">
         <button class="button button-clear no-animation text-white"
-                ng-click="previous()" ng-show="slideIndex > 0">
+                ng-click="previous()" ng-show="slideIndex > 0 && dataPlayground.comments.length>0">
             Retour fiche
         </button>
     </ion-nav-buttons>
     <ion-nav-buttons side="right"> 
         <button class="button button-clear no-animation text-white"
-                ng-click="next()" ng-show="slideIndex != 1">
+                ng-click="next()" ng-show="slideIndex != 1 && dataPlayground.comments.length>0">
             Voir les commentaires
         </button>
     </ion-nav-buttons>
@@ -73,9 +73,9 @@
                     </div>                                        
                 </div>
             </ion-slide>
-            <ion-slide>
+            <ion-slide ng-if="dataPlayground.comments.length>0">
                 <div class="list">
-                        <a class="item item-avatar overflow" href="#" ng-repeat="comment in dataPlayground.comments" ng-show="dataPlayground.comments.length != 0">
+                        <a class="item item-avatar overflow" href="#" ng-repeat="comment in dataPlayground.comments | orderObjectBy:'created_at':true" ng-show="dataPlayground.comments.length != 0">
                             <img ng-if="comment.user.file_name" ng-src="{{ avatar_url }}{{comment.user.file_name}}" />
                             <img ng-if="!comment.user.file_name" ng-src="img/avatar_default.png" />
                             <h2>{{ comment.user.username}}</h2> <span class="comment-date">le {{ comment.created_at | date:"dd/MM/yyyy" }}</span>

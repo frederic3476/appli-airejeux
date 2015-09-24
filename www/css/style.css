@@ -25,11 +25,11 @@
 
     
 #img64{
-    width: 100px;
+    width: 300px;
     display: block;
     margin:10px auto;
     background-size: contain;
-    border: 2px solid black;
+    border: 1px solid #FBB03B;
 }
 
 .half_opacity{
