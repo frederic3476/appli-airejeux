@@ -1,0 +1,18 @@
+<ion-view view-title="Carte des aires de jeux">
+    <ion-nav-buttons side="right"> 
+        <a class="button button-icon icon ion-refresh"
+                ng-click="doRefresh()">
+        </a>
+  </ion-nav-buttons> 
+  <ion-content class="has-footer" id="map_content">
+    <ion-refresher
+        pulling-text="Pull to refresh..."
+        on-refresh="doRefresh()">
+    </ion-refresher>  
+    <div id="map" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>
+  </ion-content>
+    <ion-footer-bar class="bar-calm footerBar"> 
+      <!--<a href="#/tab/closePlayground" class="button button-clear pull-left button-icon icon ion-android-settings"></a>-->
+      <a href="#/tab/closePlayground" class="button button-clear pull-right button-icon icon ion-android-list"></a>
+    </ion-footer-bar>
+</ion-view>

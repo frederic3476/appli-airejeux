@@ -1,0 +1,93 @@
+<ion-view  cache-view="false" view-title="Ajouter une aire de jeux">
+    <form name="addForm" novalidate ng-submit="addPlayground()">
+    <ion-content class="has-footer"> 
+        
+            <div class="list"> 
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Nom</span>
+                    <input name="nom" type="text" placeholder="Nom:" required ng-model="playgroundData.nom" ng-minlength="5">
+                </label>
+                <label class="item item-input item-select">
+                    <span class="input-label">Ville</span>
+                    <select name="ville_str" ng-model="playgroundData.ville_str" ng-options="opt.id as opt.label for opt in options" required>
+                    </select>
+                </label>
+                <label class="item item-input item-select">
+                    <div class="input-label">Surface</div>
+                    <select name="surface" required ng-model="playgroundData.surface">
+                                <option value="synthétique">Synthétique</option>
+                                <option value="sable">Sable</option>
+                                <option value="stabilisé">Stabilisé</option>
+                                <option value="béton">Béton</option>
+                                <option value="pelouse">Pelouse</option>
+                                <option value="gravier">Gravier</option>
+                    </select>
+                </label>
+                <div class="row item range range-positive">  
+                    <div class="col-50">
+                        <span class="input-label">Age minimum : <span id="age_min_value">{{playgroundData.age_min}}</span> ans</span>
+                    </div>
+                    <div class="col-50">
+                        <input type="range" name="age_min" min="1" max="6" step="1" value="1" ng-model="playgroundData.age_min">
+                    </div>    
+                    
+                </div>
+                <div class="row item range range-positive">
+                    <div class="col-50">
+                        <span class="input-label">Age maximum : <span id="age_max_value">{{playgroundData.age_max}}</span> ans</span>
+                    </div>    
+                    <div class="col-50">    
+                        <input type="range" name="age_max" min="6" max="15" step="1" value="6" ng-model="playgroundData.age_max">
+                    </div>    
+                    
+                </div>
+                <div class="row item range range-positive">
+                    <div class="col-50">
+                        <span class="input-label">Nombre de jeux : <span id="nbr_jeux_value">{{playgroundData.nbr_jeux}}</span></span>
+                    </div>    
+                    <div class="col-50">    
+                        <input type="range" name="nbr_jeux" min="1" max="20" step="1" value="1" ng-model="playgroundData.nbr_jeux">
+                    </div>                        
+                </div>
+                <ion-toggle ng-model="playgroundData.is_picnic.checked" ng-checked="playgroundData.is_picnic.checked">
+                        Aire de pique-nique
+                </ion-toggle>
+                <ion-toggle ng-model="playgroundData.is_sport.checked" ng-checked="playgroundData.is_sport.checked">
+                        Equipements sportifs
+                </ion-toggle>
+                <ion-toggle ng-model="playgroundData.is_shadow.checked" ng-checked="playgroundData.is_shadow.checked">
+                        Ombre
+                </ion-toggle>
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Informations complémentaires</span>
+                    <textarea cols="8" name="description" placeholder="(500 caractères maximum)" ng-model="playgroundData.description" ng-maxlength="500"></textarea>
+                </label>
+                <input type="hidden" name="latitude" ng-model="playgroundData.latitude">
+                <input type="hidden" name="longitude" ng-model="playgroundData.longitude"> 
+                <input type="hidden" name="img64" ng-model="playgroundData.img64">                
+                
+                <div class="item item-input item-stacked-label">
+                    <span class="input-label"> Votre photo :</span>
+                    <img id="img64" data-ng-src="{{lastPhoto}}" data-err-src="img/imagedefaut.png" /> 
+                </div>    
+            </div>
+            
+        
+        
+    </ion-content>
+    <ion-footer-bar class="row bar-light has-tabs footer-large center">
+        <div class="col col-33">
+                      <a class="button button-circle button-clear icon ion-camera" ng-click="getPhoto()"></a>
+        </div>      
+          <div class="col col-33">        
+              <button class="button button-circle button-large button-clear icon ion-checkmark"></button>
+           </div>            
+           <div class="col col-33">       
+               
+                      <a class="button button-circle button-small button-clear icon ion-refresh pull-right" ng-click="cancel()"></a>
+             </div>          
+                    
+                  
+    </ion-footer-bar>
+    </form>
+</ion-view>

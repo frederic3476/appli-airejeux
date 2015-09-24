@@ -1,0 +1,29 @@
+<ion-view view-title="Identification">
+    <ion-content data-tap-disabled="true" padding="true">
+        <h3>Rejoignez-nous!</h3>
+        <form name="login_form" ng-submit="doLogin()" novalidate>
+            <div class="list">
+                <label class="item item-input">
+                    <span class="input-label">Login</span>
+                    <input type="text" ng-model="loginData.username" required>
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">Mot de passe</span>
+                    <input type="password" ng-model="loginData.password" required>
+                </label>
+                <label class="item item_compte_bottom">
+                    <ion-toggle class="item-checkbox-compte button-transparent" ng-model="loginData.remember" ng-checked="loginData.remember">Se souvenir de moi</ion-toggle> 
+                </label>
+                <label class="item item_compte_top">                    
+                    <button class="button button-block button-orange" type="submit">Identification</button>
+                </label>
+            </div>
+        </form>
+        <div class="list">
+            <label class="item item_compte_bottom">
+                <button class='button button-compte icon-left ion-help button-transparent center-block' ng-click="openBrowser('http://www.airejeux.com/resetting/request')">J'ai oublié mon mot de passe</button>
+                <button class='button button-block button-orange' ng-click="openBrowser('http://www.airejeux.com/register')">Inscription</button>  
+            </label>  
+        </div>
+    </ion-content>
+</ion-view>

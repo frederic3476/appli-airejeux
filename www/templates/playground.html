@@ -1,0 +1,103 @@
+<ion-view view-title="">
+    <ion-nav-buttons side="left">
+        <button class="button back-button buttons button-clear header-item" ng-click="goBack()">
+            <i class="icon ion-ios-arrow-back"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="primary">
+        <button class="button button-clear no-animation text-white"
+                ng-click="previous()" ng-show="slideIndex > 0">
+            Retour fiche
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right"> 
+        <button class="button button-clear no-animation text-white"
+                ng-click="next()" ng-show="slideIndex != 1">
+            Voir les commentaires
+        </button>
+    </ion-nav-buttons>
+
+    <ion-content class="has-footer"> 
+        <ion-refresher
+            pulling-text="Rafraichir..."
+            on-refresh="doRefresh(dataPlayground.id)">
+        </ion-refresher>
+        <ion-slide-box on-slide-changed="slideChanged(index)">
+            <ion-slide>
+                <div class="list card">
+
+                    <div class="item titre">
+                        <h3>{{ dataPlayground.nom}}</h3>
+                    </div>
+
+                    <div class="item item-body">
+                        <img class="initWidth" ng-src="img/imagedefaut.png" loading-src="{{ dataPlayground.img_name}}" loading-class="full-image" imageonload>
+                            
+                        <span class="note_playground">
+                            <note-display average="{{ dataPlayground.average }}"></note-display>
+                        </span>
+                        <span id="note_value" note-transform average="{{ dataPlayground.average }}"></span>                        
+                        <h2>Caractéristiques:</h2>
+                        <div class="row">
+                            <div class="col col-50">Age: {{ dataPlayground.age_min}} à {{ dataPlayground.age_max}} ans</div>                         
+                            <div class="col col-50">Surface: {{ dataPlayground.surface}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col col-25">
+                                <div class=" nbjeux text-center">
+                                    <span class="number_game">{{ dataPlayground.nbr_jeux}}</span>
+                                    <span class="text_game"> jeux </span>
+                                </div>
+                            </div>    
+                            <div ng-show="dataPlayground.is_picnic" class="col col-25"><img src="img/picnic_on.png" /></div>
+                            <div ng-show="!dataPlayground.is_picnic" class="col col-25 half_opacity"><img src="img/picnic_off.png" /></div>
+                            <div ng-show="dataPlayground.is_sport" class="col col-25"><img src="img/sport_on.png" /></div>                          
+                            <div ng-show="!dataPlayground.is_sport" class="col col-25 half_opacity"><img src="img/sport_off.png" /></div>  
+                            <div ng-show="dataPlayground.is_shadow" class="col col-25"><img src="img/shadow_on.png" /></div>
+                            <div ng-show="!dataPlayground.is_shadow" class="col col-25 half_opacity"><img src="img/shadow_off.png" /></div>
+                        </div>
+                        <div ng-show="dataPlayground.description">
+                            <h2>Information Complémentaires:</h2>
+                            <p  ng-bind-html="dataPlayground.description | to_trusted">
+                            </p>
+                        </div>
+                        <p>
+                            <button ng-click="next()" ng-show="slideIndex != 1" class="button button-clear no-animation subdued">
+                                <ng-pluralize count="dataPlayground.comments.length"
+                                    when="{'0': 'aucun commentaire',
+                                           'one': '1 commentaire',
+                                           'other': '{} commentaires'}">                                  
+                                </ng-pluralize>
+                            </button>
+                        </p>
+                    </div>                                        
+                </div>
+            </ion-slide>
+            <ion-slide>
+                <div class="list">
+                        <a class="item item-avatar overflow" href="#" ng-repeat="comment in dataPlayground.comments" ng-show="dataPlayground.comments.length != 0">
+                            <img ng-if="comment.user.file_name" ng-src="{{ avatar_url }}{{comment.user.file_name}}" />
+                            <img ng-if="!comment.user.file_name" ng-src="img/avatar_default.png" />
+                            <h2>{{ comment.user.username}}</h2> <span class="comment-date">le {{ comment.created_at | date:"dd/MM/yyyy" }}</span>
+                            <p class="overflow" ng-bind-html="comment.texte | to_trusted"></p>
+                        </a>
+                </div>    
+            </ion-slide>
+        </ion-slide-box>        
+    </ion-content>
+    <ion-footer-bar class="row bar-light has-tabs footer-large center">
+        <div class="col col-25">
+            <button class="button button-circle button-clear icon ion-thumbsup" ng-click="vote()"></button>
+        </div>      
+        <div class="col col-25">        
+            <button class="button button-circle button-large button-clear icon ion-chatbox" ng-click="comment()"></button>
+        </div>            
+        <div class="col col-25">    
+            <button class="button button-circle button-small button-clear icon ion-android-share-alt pull-right" ng-click="share()"></button>
+        </div>
+        <div class="col col-25">    
+            <button class="button button-circle button-small button-clear icon ion-camera pull-right" ng-click="changePicture()"></button>
+        </div>  
+    </ion-footer-bar>
+</ion-view>
+

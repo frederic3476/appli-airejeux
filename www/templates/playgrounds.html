@@ -1,0 +1,26 @@
+<ion-view view-title="Liste des aires">
+    <ion-nav-buttons side="right"> 
+        <a class="button button-icon icon ion-search"
+                href="#/tab/search">
+        </a>
+  </ion-nav-buttons> 
+    <ion-content> 
+        <ion-list>
+            <ion-item class="item-thumbnail-left item-icon-right" ng-repeat="playground in playgrounds | limitTo: limitPlay" nav-transition="android" href="#/playground/{{ playground.id}}">             
+                <img ng-src="img/thumbnail_defaut.png" loading-class="thumbnail" loading-src="{{ playground.file_name?img_url+'100-'+playground.file_name: 'img/thumbnail_defaut.png' }}" imageonload />    
+                <h2>{{playground.nom}}</h2>
+                <span class="note_playground_list">
+                    <note-display average="{{ playground.average }}"></note-display>
+                </span>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+        </ion-list>
+        <ion-infinite-scroll
+            ng-if="limitPlay <= playgrounds.length"
+            icon="android"
+            on-infinite="loadMore()"
+            distance="5%">
+        </ion-infinite-scroll>
+    </ion-content>
+</ion-view>
+

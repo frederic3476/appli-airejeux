@@ -1,0 +1,21 @@
+<ion-modal-view class="modal-playground">
+  <ion-header-bar class="bar-calm">
+    <h1 class="title">Voter</h1>
+    <div class="buttons">
+      <div class="button button-clear" ng-click="closeVote()"><span class="icon ion-close"></span></div>
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <form ng-submit="doVote()">
+      <div class="list">
+        <div class="item range range-positive">  
+                        <span class="input-label">Vote note : <span>{{voteData.score}}</span> /5</span>
+                        <input type="range" name="score" min="0.5" max="5" step="0.5" value="1" ng-model="voteData.score">
+                </div>
+        <label class="item">
+          <button class="button button-block button-positive" type="submit">Voter</button>
+        </label>
+      </div>
+    </form>
+  </ion-content>
+</ion-modal-view>

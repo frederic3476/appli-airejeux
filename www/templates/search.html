@@ -1,0 +1,25 @@
+<ion-view view-title="Rechercher une ville">
+    <ion-nav-buttons side="right"> 
+        <a class="button button-icon icon ion-search"
+                ng-click="showPopup()">
+        </a>
+  </ion-nav-buttons> 
+  <ion-content> 
+      <ion-list>
+          <ion-item class="item-icon-right" ng-repeat="city in cities_search" href="#/tab/playgrounds/{{ city.id }}">
+              <h2>{{city.nom}} - {{city.code}}<i class="ion-android-star" ng-if="isFavorite(city.id)"></i></h2>
+              <span class="badge badge-energized">
+                  <ng-pluralize count="city.value"
+                    when="{'0': '0 aire',
+                           'one': '1 aire',
+                           'other': '{} aires'}">                                  
+                  </ng-pluralize>
+              </span>
+              <ion-option-button class="button button-assertive ion-minus-circled" ng-click="deleteCity(city.id)" ng-if="isFavorite(city.id)"></ion-option-button>
+              <ion-option-button class="button button-balanced ion-plus-circled" ng-click="addCity(city.id)" ng-if="!isFavorite(city.id)"></ion-option-button>
+              <i class="icon ion-chevron-right icon-accessory"></i>
+          </ion-item>
+    </ion-list>
+      <p ng-show="cities_search.length==0">Aucune ville trouvée</p>
+  </ion-content>
+</ion-view>

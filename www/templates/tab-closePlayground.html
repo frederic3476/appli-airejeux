@@ -1,0 +1,32 @@
+<ion-view view-title="Liste des aires proches">
+    <ion-nav-buttons side="right"> 
+        <a class="button button-icon icon ion-refresh"
+                ng-click="doRefresh()">
+        </a>
+    </ion-nav-buttons> 
+    <ion-content> 
+        <ion-list>
+            <ion-item class="item-thumbnail-left item-icon-right" ng-repeat="playground in close_playgrounds | orderObjectBy:'distanceKm':false | limitTo: limitPlay" href="#/playground/{{ playground.id}}">             
+                <img ng-src="img/thumbnail_defaut.png" loading-src="{{ playground.file_name?img_url+'100-'+playground.file_name: 'img/thumbnail_defaut.png' }}" imageonload />    
+                <div class="playground-body">
+                    <h2>{{playground.nom|truncate_text:'21'}}</h2>
+                    <div class="fleft">
+                    <span class="note_playground_list">
+                        <note-display average="{{ playground.average }}"></note-display>
+                    </span>
+                    </div>
+                    <div class="fright distance">{{ playground.distance}}</div>
+                </div>                
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+        </ion-list>
+        <ion-infinite-scroll
+            ng-if="limitPlay <= close_playgrounds.length"
+            icon="android"
+            on-infinite="loadMore()"
+            distance="5%">
+        </ion-infinite-scroll>
+        <p ng-show="close_playgrounds.length==0">Aucune aire proche de votre position</p>
+    </ion-content>
+    <distance></distance>
+</ion-view>    
