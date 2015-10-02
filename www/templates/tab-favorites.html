@@ -1,19 +1,18 @@
 <ion-view view-title="Liste des départements">
   <ion-nav-buttons side="right"> 
-        <a class="button button-icon icon ion-search"
-                href="#/tab/search">
-        </a>
+        <a class="button button-icon icon ion-more" ng-click="popover.show($event)"></a>
   </ion-nav-buttons>  
   <ion-content>
       <ion-refresher
-        pulling-text="Pull to refresh..."
-        on-refresh="doRefresh()">
+        pulling-text="Rafraîchir..."
+        on-refresh="doRefresh()" 
+        refreshing-icon="">
       </ion-refresher>
-      <ion-list>
-        <ion-item class="item-icon-right" ng-repeat="favorite in favorites" ng-show="favorite.value !=0" href="#/tab/cities/{{ favorite.id }}">
-            <h2>{{favorite.nom}} - {{favorite.code}}</h2>
+    <ion-list>
+        <ion-item class="item-icon-right" collection-repeat="depart in departs" ng-show="depart.value !=0" href="#/tab/cities/{{ depart.id }}">
+            <h2>{{depart.nom}} <i class="code">{{depart.code}}</i></h2>
             <span class="badge badge-energized">
-                <ng-pluralize count="favorite.value"
+                <ng-pluralize count="depart.value"
                     when="{'0': '0 aire',
                            'one': '1 aire',
                            'other': '{} aires'}">                                  
@@ -21,6 +20,7 @@
             </span>
             <i class="icon ion-chevron-right icon-accessory"></i>
         </ion-item>
-    </ion-list>
+    </ion-list>  
+      
   </ion-content>
 </ion-view>

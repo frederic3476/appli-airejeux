@@ -1,14 +1,47 @@
 angular.module('starter.services', [])
 
-.factory('Playgrounds', function($rootScope, $http, $state, $cordovaToast, $cordovaDialogs) {
+
+.factory('Account', function($http, $cordovaDialogs, $cordovaToast){
+    return {
+        resetting: function(username){
+            promise = $http({
+                url: api_url+"passwords/resetting.json?username="+username,
+                method: "GET"
+            }).then(function(response){
+                $cordovaToast.show('Un e-mail a été envoyé avec votre nouveau mot de passe', 'long', 'center'); 
+            },function(error){
+                $cordovaDialogs.alert(JSON.stringify(error.data), 'Erreur'); 
+            }
+                    );
+            return promise;
+        },
+        
+        register: function(dataPost){
+            promise = $http({
+                url: api_url+"registers.json",
+                method: "POST",
+                data: dataPost
+            }).then(function(response){
+                $cordovaToast.show('Vous vou êtes enregistré avec succés !', 'short', 'center');
+                return response;
+            },function(error){                
+                $cordovaDialogs.alert(JSON.stringify(error.data), 'Erreur');  
+                console.log(JSON.stringify(error));
+                return error;
+            }
+                    );
+            return promise;
+        }
+    };
+})
+
+.factory('Playgrounds', function($rootScope, $http, $state, $cordovaToast, $cordovaDialogs, MapUtils) {
     
     var playgrounds = [];
     var close_playgrounds = [];
 
   return {
     new: function(dataPost, header){
-        //TODO use $timeout 1min ?
-        
         promise = $http({
                 url: api_url+"aires",
                 method: "POST",
@@ -48,6 +81,11 @@ angular.module('starter.services', [])
                 method: "GET"
             }).then(function(response){
                 close_playgrounds = response.data;
+                for (i in close_playgrounds) {
+                            latLng = new google.maps.LatLng(close_playgrounds[i].latitude, close_playgrounds[i].longitude);
+                            close_playgrounds[i].distance = MapUtils.getDistance(latLng).distance;
+                            close_playgrounds[i].distanceKm = parseFloat(MapUtils.getDistance(latLng).km);
+                        }
                 return close_playgrounds;
             },function(error){
                 $cordovaDialogs.alert('Merci de recommencer l\'opération', 'Erreur réseau');
@@ -60,14 +98,12 @@ angular.module('starter.services', [])
       for (var i = 0; i < playgrounds.length; i++) {
         if (playgrounds[i].id === parseInt(playgroundId)) {
           playgrounds[i].img_name = (playgrounds[i].file_name ? $rootScope.img_url + '500-'+playgrounds[i].file_name : 'img/imagedefaut.png');
-          //playgrounds[i].description = playgrounds[i].description.replace(new RegExp('\r?\n','g'), '<br />');
           return playgrounds[i];
         }
       }
       for (var i = 0; i < close_playgrounds.length; i++) {
         if (close_playgrounds[i].id === parseInt(playgroundId)) {
           close_playgrounds[i].img_name = (close_playgrounds[i].file_name ? $rootScope.img_url + '500-'+close_playgrounds[i].file_name : 'img/imagedefaut.png');  
-          //close_playgrounds[i].description = close_playgrounds[i].description.replace(new RegExp('\r?\n','g'), '<br />');
           return close_playgrounds[i];
         }
       }
@@ -150,17 +186,14 @@ angular.module('starter.services', [])
 })
 
 .factory('Favorites', function($http) {
-    var favorites = [];
-    
     return {
-        getFavorites: function(){
+        getDeparts: function(){
             
             promise = $http({
                 url: api_url+"departement/list.json",
                 method: "GET"
             }).then(function(response){
-                favorites = response.data;
-                return favorites;
+                return response.data;
             },function(error){
                 console.log(JSON.stringify(error));
             }
@@ -172,6 +205,7 @@ angular.module('starter.services', [])
 
 .factory('Cities', function($rootScope, $http) {
     var cities = [];
+    var cityFavorites = [] || JSON.parse(localStorage.getItem('cityFavorites'));
     
     return {
         getCloseCities: function(){
@@ -216,21 +250,47 @@ angular.module('starter.services', [])
             return promise;
         },
         
-        addCity: function(cityId){
-            cityFavorites = [];
-                if (localStorage.getItem('cityFavorites')) {
-                    cityFavorites = JSON.parse(localStorage.getItem('cityFavorites'));
+        getCitiesByFavorite: function(){
+                data = JSON.parse(localStorage.getItem('cityFavorites'));
+                ids = "";
+                for (i in data){
+                    ids += data[i].id+"|";
                 }
-
-                cityFavorites.push(cityId);
+                
+                promise = $http({
+                    url: api_url+"favorites/cities.json",
+                    method: "POST",
+                    data: {'favorite':ids}
+                }).then(function(response){
+                    cityFavorites = response.data
+                    return cityFavorites;
+                },function(error){
+                    return getAllFavorites();
+                }
+                        );
+                return promise;
+        },
+        
+        getAllFavorites: function(){
+            if (localStorage.getItem('cityFavorites')){
+                cityFavorites = JSON.parse(localStorage.getItem('cityFavorites'));
+            }
+            return cityFavorites;            
+        },
+        
+        addCity: function(city){
+                newCity = {};
+                newCity.id = city.id;
+                newCity.nom = city.nom;
+                newCity.code = city.code;
+                newCity.value = city.value;
+                cityFavorites.push(newCity);
                 localStorage.setItem('cityFavorites', JSON.stringify(cityFavorites));
         },
         
         deleteCity: function(cityId){
-            cityFavorites = JSON.parse(localStorage.getItem('cityFavorites'));
-
                 for (var i = cityFavorites.length - 1; i >= 0; i--) {
-                    if (parseInt(cityFavorites[i]) === cityId) {
+                    if (parseInt(cityFavorites[i].id) === cityId) {
                         cityFavorites.splice(i, 1);
                     }
                 }
@@ -242,9 +302,8 @@ angular.module('starter.services', [])
                     return false;
                 }
                 else {
-                    cityFavorites = JSON.parse(localStorage.getItem('cityFavorites'));
                     for (i in cityFavorites) {
-                        if (parseInt(cityFavorites[i]) === cityId) {
+                        if (parseInt(cityFavorites[i].id) === cityId) {
                             return true;
                         }
                     }
@@ -254,7 +313,7 @@ angular.module('starter.services', [])
     };
 })
 
-.factory('Camera', ['$q', function($q) {
+.factory('Photo', ['$q', function($q) {
 
       return {
         getPicture: function(options) {
@@ -386,7 +445,7 @@ angular.module('starter.services', [])
   
  }])
  
-.factory('MapUtils', function($rootScope, $http) {
+.factory('MapUtils', function($rootScope) {
     return {
         getDistance: function(latLng) {
             var myLatLng = new google.maps.LatLng($rootScope.latitude, $rootScope.longitude);

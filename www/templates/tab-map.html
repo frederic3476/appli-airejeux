@@ -4,15 +4,44 @@
                 ng-click="doRefresh()">
         </a>
   </ion-nav-buttons> 
-  <ion-content class="has-footer" id="map_content">
-    <ion-refresher
-        pulling-text="Pull to refresh..."
-        on-refresh="doRefresh()">
-    </ion-refresher>  
-    <div id="map" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>
+  <ion-content class="ionic-scroll has-footer" id="map_content">
+    <ion-slide-box ng-init="disableSwipe()" show-pager="false">
+        <ion-slide>  
+            <div id="map" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>
+        </ion-slide>
+        <ion-slide>
+            <ion-scroll zooming="false" direction="y" style="width: 100%; height: 100%;">
+                <ion-item class="item-thumbnail-left item-icon-right" 
+                          ng-repeat="playground in close_playgrounds | orderObjectBy:'distanceKm':false | limitTo: limitPlay" 
+                          href="#/playground/{{ playground.id}}"
+                          ng-show="playground.distanceKm<=distance">             
+                    <img ng-src="img/thumbnail_defaut.png" loading-src="{{ playground.file_name?img_url+'100-'+playground.file_name: 'img/thumbnail_defaut.png' }}" imageonload />    
+                    <div class="playground-body">
+                        <h2>{{playground.nom|truncate_text:'21'}}</h2>
+                        <div class="fleft">
+                        <span class="note_playground_list">
+                            <note-display average="{{ playground.average }}"></note-display>
+                        </span>
+                        </div>
+                        <div class="fright distance">{{ playground.distance}}</div>
+                    </div>                
+                    <i class="icon ion-chevron-right icon-accessory"></i>
+                </ion-item>
+            </ion-scroll>
+        <ion-infinite-scroll
+            ng-if="limitPlay <= close_playgrounds.length"
+            icon="android"
+            on-infinite="loadMore()"
+            distance="5%">
+        </ion-infinite-scroll>
+        <p ng-show="close_playgrounds.length==0">Aucune aire proche de votre position</p>
+        </ion-slide>
+    </ion-slide-box>  
   </ion-content>
     <ion-footer-bar class="bar-calm footerBar"> 
-      <!--<a href="#/tab/closePlayground" class="button button-clear pull-left button-icon icon ion-android-settings"></a>-->
-      <a href="#/tab/closePlayground" class="button button-clear pull-right button-icon icon ion-android-list"></a>
+      <a class="pull-left button-icon icon ion-android-settings" ng-click="parameter()"></a>
+      <div class="wait-map"><ion-spinner class="spinner wait-spinner {{ classSpinner }}" icon="ios"></ion-spinner><span class="message">{{ message }}</span></div>
+      <a ng-click="next()" ng-show="slideIndex != 1" class="button button-clear pull-right button-icon icon ion-android-list"></a>
+      <a ng-click="previous()" ng-show="slideIndex > 0" class="button button-clear pull-right button-icon icon ion-map"></a>
     </ion-footer-bar>
 </ion-view>

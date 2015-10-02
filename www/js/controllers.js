@@ -1,10 +1,14 @@
 angular.module('starter.controllers', [])
 
-        .controller('MapCtrl', function ($scope, $rootScope, $state, $ionicLoading, $ionicHistory, $cordovaDialogs, $compile, Playgrounds, MapUtils, $cordovaSplashscreen) {            
+        .controller('MapCtrl', function ($scope, $rootScope, $state, $ionicLoading, $ionicHistory, $ionicModal, 
+                                            $cordovaDialogs, $compile, Playgrounds, $cordovaSplashscreen, $ionicSlideBoxDelegate) {            
             var infowindow;
             var markers =[];
-          
-
+            
+            $rootScope.distance = 5;
+            
+            $scope.slideIndex = 0;
+            
             $scope.$on('$ionicView.beforeEnter', function (viewInfo, state) {
                 if (map) {
                     setTimeout(function () {
@@ -16,34 +20,53 @@ angular.module('starter.controllers', [])
             $scope.$on('new-playground', function(event, args) { 
                console.log('new playground'); 
                $scope.doRefresh();
+               //todo push new playground and marker
             });
+            
+            $scope.next = function () {                
+                $ionicSlideBoxDelegate.next(1000);
+                $scope.slideIndex = 1;
+            };
+            
+            $scope.previous = function () {
+                $ionicSlideBoxDelegate.previous(1000);
+                $scope.slideIndex = 0;
+            };
+            
+            $scope.slideChanged = function (index) {
+                $scope.slideIndex = index;
+            };
+            
+            $scope.disableSwipe = function() {
+                $ionicSlideBoxDelegate.enableSlide(false);
+            };
+            
+            $scope.message = "Chargement de la carte...";
+            $scope.classSpinner = "";
+            
             function initialize() {
-                $ionicLoading.show({
-                    template: '<span class="loading_map">Chargement de la carte...</span>',
-                    showBackDrop: true
-                });
                 
                 
                 map = new google.maps.Map(document.getElementById("map"));
                 
-                map.addListener('google-map-ready', function () {
-                        $ionicLoading.hide();
-                    });
+                google.maps.event.addListenerOnce(map, 'idle', function(){
+                    //$cordovaSplashscreen.hide();
+                    $scope.message = "";
+                    $scope.classSpinner = "hide";
+                });
                     
                 navigator.geolocation.getCurrentPosition(function (pos) {
                     $rootScope.latitude = pos.coords.latitude;
                     $rootScope.longitude = pos.coords.longitude;
-                    //alert('ok1');
                    
                     var myLatlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
                     var mapOptions = {
                         center: myLatlng,
-                        zoom: 14,
+                        zoom: 15,
                         mapTypeId: google.maps.MapTypeId.ROADMAP,
                         minZoom: 12
                     };
-                    
-                    //alert('ok2');    
+                      
                     //my position
                     GeoMarker = new GeolocationMarker();
                     GeoMarker.setCircleOptions({fillColor: '#808080'});
@@ -51,39 +74,23 @@ angular.module('starter.controllers', [])
                     //watchPosition include
                     GeoMarker.setMap(map);
                     
-                    map.setOptions(mapOptions);                    
-                    //alert('ok3');
+                    map.setOptions(mapOptions); 
                     
-                    google.maps.event.addListener(GeoMarker, 'position_changed', function () {       
-                        
-                        $scope.nbrChange++; 
+                    google.maps.event.addListener(GeoMarker, 'position_changed', function () {    
                         position = this.getPosition();                        
                         $rootScope.latitude = position.lat();
                         $rootScope.longitude = position.lng();
-                        //alert(position.lat()+"/"+position.lng());
-                        //map.setCenter(position);
                         this.marker.setPosition(position);
-                        $scope.position = $rootScope.latitude +"/"+$rootScope.longitude;
                     });
-                        
-                    
-                    
-                    $ionicLoading.hide();
-                    $cordovaSplashscreen.hide();
-                    //alert('ok4');
+                                                                                    
                     Playgrounds.getNearPlaygrounds($rootScope.latitude, $rootScope.longitude, $rootScope.perimeter).then(function (data) {
-                        for (i in data) {
-                            latLng = new google.maps.LatLng(data[i].latitude, data[i].longitude);
-                            //TODO use directive for distance
-                            data[i].distance = MapUtils.getDistance(latLng).distance;
-                            data[i].distanceKm = parseFloat(MapUtils.getDistance(latLng).km);
-                        }
                         $rootScope.close_playgrounds = data;
-                        setMarkers(map, data);
+                        //todo make a factory
+                        createMarkers(map, data);
+                        setMarkers(map, $rootScope.distance);
                     });
 
                     $rootScope.map = map;
-                    //$rootScope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
                 }, function (error) {
                     $cordovaDialogs.alert(error.message, 'Erreur de localisation');
                 }, {maximumAge: 60000, timeout: 30000, enableHighAccuracy: true});
@@ -91,49 +98,61 @@ angular.module('starter.controllers', [])
                 document.addEventListener("resume", function() {$scope.doRefresh();}, false);
 
             }
-            if ($ionicHistory.currentStateName() !== 'tab.closePlayground') {
-                ionic.Platform.ready(initialize);
-            }                        
+            
+            ionic.Platform.ready(initialize);
             
             $scope.clickMarker = function (playgroundId) {
                 $state.go('playground', {playgroundId: playgroundId});
                 infowindow.close();
             };
-
-            function setMarkers(map, playgrounds)
+            
+            //todo make a factory
+            function createMarkers(map, playgrounds, distance)
             {
                 var myLatLng = new google.maps.LatLng($rootScope.latitude, $rootScope.longitude);
-                for (var i = 0; i < playgrounds.length; i++) {
-
+                for (var i = 0; i < playgrounds.length; i++) {                        
                     var playground = playgrounds[i];
-                    var latLng = new google.maps.LatLng(playground.latitude, playground.longitude);
-                    //var distance = google.maps.geometry.spherical.computeDistanceBetween(myLatLng, latLng);
-                    srcImg = (playground.file_name ? $rootScope.img_url + '100-'+ playground.file_name : 'img/imagedefaut.png');
-                    var contentString =
-                            '<div class="content" nav-transition="android" ng-click=\'clickMarker(' + playground.id + ')\'>' +
-                            '<img ng-src="' + srcImg + '"/>' +
-                            '<div class="bodyContent">' +
-                            '<h4 id="playground-' + playground.id + '" class="headingContent">' + playground.nom.substring(0,19) + (playground.nom.length>19?"...":"") + '</h4>' +
-                            '<p><span class="average" note-transform average="' + (playground.average?parseFloat(playground.average).toFixed(1):'') + '"></span> <span class="distance">' + playground.distance + '</span></p>' +
-                            '</div>' +
-                            '</div>';
-                    var compiled = $compile(contentString)($scope);
                     
-                    //TODO make service
-                    var marker = new google.maps.Marker({
-                        position: latLng,
-                        map: map,
-                        title: playground.nom,
-                        animation: google.maps.Animation.DROP,
-                        icon: icon
-                    });
-                    
-                    markers.push(marker);
+                        var latLng = new google.maps.LatLng(playground.latitude, playground.longitude);
+                        srcImg = (playground.file_name ? $rootScope.img_url + '100-'+ playground.file_name : 'img/imagedefaut.png');
+                        var contentString =
+                                '<div class="content" nav-transition="android" ng-click=\'clickMarker(' + playground.id + ')\'>' +
+                                '<img ng-src="' + srcImg + '"/>' +
+                                '<div class="bodyContent">' +
+                                '<h4 id="playground-' + playground.id + '" class="headingContent">' + playground.nom.substring(0,19) + (playground.nom.length>19?"...":"") + '</h4>' +
+                                '<p><span class="average" note-transform average="' + (playground.average?parseFloat(playground.average).toFixed(1):'') + '"></span> <span class="distance">' + playground.distance + '</span></p>' +
+                                '</div>' +
+                                '</div>';
+                        var compiled = $compile(contentString)($scope);
 
-                    google.maps.event.addListener(marker, 'click', getInfoCallback(map, compiled[0]));
+                        //TODO make service
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            map: null,
+                            title: playground.nom,
+                            icon: icon,
+                            distance: playground.distanceKm
+                        });
+
+                        markers.push(marker);
+
+                        google.maps.event.addListener(marker, 'click', getInfoCallback(map, compiled[0]));
                 }
             }
-
+            
+            function setMarkers(map, distance){
+                for (var i = 0; i < markers.length; i++) {
+                    mark = markers[i];
+                    if (mark.distance<distance){
+                        mark.setMap(map);
+                    }
+                    else{
+                        mark.setMap(null);
+                    }
+                }
+            }
+            
+            //todo make a factory
             function getInfoCallback(map, content) {
                 if (infowindow)
                     infowindow.close();
@@ -145,22 +164,17 @@ angular.module('starter.controllers', [])
             }
             
              $scope.doRefresh = function() {
-                 $rootScope.limitPlay = 8;
+                 $rootScope.limitPlay = 15;
                  //center map
                  if (map){
                      map.setCenter({lat: $rootScope.latitude, lng: $rootScope.longitude});
                  }
-                 
                  $rootScope.close_playgrounds = [];
                  deleteMarkers();
                  Playgrounds.getNearPlaygrounds($rootScope.latitude, $rootScope.longitude, $rootScope.perimeter).then(function (data) {
-                        for (i in data) {
-                            latLng = new google.maps.LatLng(data[i].latitude, data[i].longitude);
-                            data[i].distance = MapUtils.getDistance(latLng).distance;
-                            data[i].distanceKm = parseFloat(MapUtils.getDistance(latLng).km);
-                        }
                         $rootScope.close_playgrounds = data;
-                        setMarkers(map, data);
+                        createMarkers(map, data);
+                        setMarkers(map, $rootScope.distance);
                     });
              };
              
@@ -181,10 +195,32 @@ angular.module('starter.controllers', [])
                 clearMarkers();
                 markers = [];
             }
-        })
-        .controller('AddCtrl', function ($scope, $rootScope, $state, Playgrounds, Cities, Camera, $cordovaDialogs) {      
+            
+            //modal window for parameters
+            $ionicModal.fromTemplateUrl('templates/parameter_modal.html', {
+                scope: $scope
+            }).then(function (modal) {
+                $scope.modal_parameter = modal;
+            });
 
-            $scope.$on('$ionicView.beforeEnter', function (viewInfo, state) {
+            $scope.closeParameter = function () {
+                $scope.modal_parameter.hide();
+            };
+
+            // Open the parameter modal
+            $scope.parameter = function () {
+               $scope.modal_parameter.show();
+            };
+            
+            $scope.doParameter = function(distance) {
+                $scope.modal_parameter.hide();
+                $rootScope.distance = distance;
+                setMarkers(map, distance);                
+            };
+        })
+        .controller('AddCtrl', function ($scope, $rootScope, $state, Playgrounds, Cities, $cordovaDialogs, $cordovaCamera) {      
+            
+            $scope.$on('$ionicView.afterEnter', function (viewInfo, state) {
                 if (!sessionStorage.getItem('token')) {
                     //TODO : add button to go to account or use broadcast $rootScope.broadcast("interdiction");
                     $cordovaDialogs.alert('Vous devez être identifié pour ajouter une aire de jeux !', 'Interdiction');
@@ -196,7 +232,9 @@ angular.module('starter.controllers', [])
 
                     Cities.getCloseCities().then(function (returnedData) {
                         for (i in returnedData) {
-                            $scope.options.push({id: returnedData[i].nom + "|" + returnedData[i].code, label: returnedData[i].nom, value: returnedData[i].nom + "|" + returnedData[i].code});
+                            $scope.options.push({id: returnedData[i].nom + "|" + returnedData[i].code, 
+                                                label: returnedData[i].nom, 
+                                                value: returnedData[i].nom + "|" + returnedData[i].code});
                         }
                     });
                 }
@@ -247,10 +285,7 @@ angular.module('starter.controllers', [])
                     };
 
                     console.log("add new playground");
-                    Playgrounds.new(dataPost, {"X-WSSE": sessionStorage.getItem('token')}).then(function (resp) {
-                        //$state.go('tab.map');
-                    }, function (err) {
-                    });
+                    Playgrounds.new(dataPost, {"X-WSSE": sessionStorage.getItem('token')});
                 }
                 else{
                     $cordovaDialogs.alert(message, 'Erreur formulaire');
@@ -259,16 +294,45 @@ angular.module('starter.controllers', [])
 
             //take picture
             $scope.getPhoto = function () {
-                Camera.getPicture({quality:40, targetWidth: 500}).then(function (imageURI) {
-                    console.log(imageURI);
-                    $scope.lastPhoto = imageURI;
-                    Camera.toBase64Image(imageURI).then(function (resp) {
-                        $scope.playgroundData.img64 = resp.imageData;
-                    });
+                var options = {
+                    quality: 40,
+                    destinationType: Camera.DestinationType.DATA_URL,
+                    encodingType: Camera.EncodingType.JPEG,
+                    targetWidth: 500,
+                    targetHeight: 280,
+                    popoverOptions: CameraPopoverOptions,
+                    saveToPhotoAlbum: false
+                  };
 
-                }, function (err) {
-                    console.err(err);
-                });
+                  $cordovaCamera.getPicture(options).then(function(imageData) {
+                      alert(imageData);
+                    $scope.lastPhoto = "data:image/jpeg;base64," + imageData;
+                    $scope.playgroundData.img64 = imageData;
+                  }, function(err) {
+                      alert(err);
+                    console.log(err);
+                  });
+                
+                
+                /*Photo.getPicture({quality:40, 
+                                    targetWidth: 500, 
+                                    targetHeight: 500,
+                                    saveToPhotoAlbum: false, 
+                                    correctOrientation: true, 
+                                    destinationType: Camera.DestinationType.DATA_URL,
+                                    encodingType: Camera.EncodingType.JPEG,
+                                }).then(function (imageURI) {
+                                    console.log(imageURI);
+                                    alert('image   '+imageURI);
+                                    $scope.lastPhoto = "data:image/jpeg;base64," +imageURI;
+                                    $scope.playgroundData.img64 = imageURI;
+                                    /*Photo.toBase64Image(imageURI).then(function (resp) {
+                                        alert('image646464   '+resp.imageData);
+                                        $scope.playgroundData.img64 = resp.imageData;
+                                    });*/
+                //}, function (err) {
+                  //  console.err(err);
+                //});  */              
             };
 
 
@@ -290,15 +354,18 @@ angular.module('starter.controllers', [])
         })
 
         .controller('PlaygroundCtrl', function ($scope, $rootScope, $stateParams, $ionicSlideBoxDelegate, $cordovaToast, 
-                                                $ionicModal, $cordovaDialogs, $ionicHistory, Playgrounds, Camera, 
-                                                $ionicPopup, $state, $cordovaSocialSharing) {
-            //$scope.slideIndex = 1;
-
+                                                $ionicModal, $cordovaDialogs, $ionicHistory, Playgrounds, $cordovaCamera,
+                                                $ionicPopup, $state, $cordovaSocialSharing) {            
+            
+            $scope.slideIndex = 0;
+            
             $scope.next = function () {
                 $ionicSlideBoxDelegate.next();
+                $scope.slideIndex = 1;
             };
             $scope.previous = function () {
                 $ionicSlideBoxDelegate.previous();
+                $scope.slideIndex = 0;
             };
             $scope.slideChanged = function (index) {
                 $scope.slideIndex = index;
@@ -309,7 +376,6 @@ angular.module('starter.controllers', [])
             var playgroundId = $stateParams.playgroundId;
 
             $scope.dataPlayground = Playgrounds.get(playgroundId);
-            //$scope.dataPlayground.img_name = ($scope.dataPlayground.file_name ? $rootScope.img_url + '500-'+$scope.dataPlayground.file_name : 'img/imagedefaut.png');
 
             //modal vote
             $scope.voteData = {};
@@ -359,7 +425,7 @@ angular.module('starter.controllers', [])
             $scope.commentData.aire_id = playgroundId;
             $ionicModal.fromTemplateUrl('templates/comment_modal.html', {
                 scope: $scope,
-                animation: 'slide-in-up'
+                focusFirstInput: true
             }).then(function (modal) {
                 $scope.modal_comment = modal;
             });
@@ -406,21 +472,26 @@ angular.module('starter.controllers', [])
                     $cordovaDialogs.alert('Il existe déjà une photo de cette aire', 'Interdiction');
                 }
                 else{
-                    Camera.getPicture({quality:40, targetWidth: 500}).then(function (imageURI) {
-                    console.log(imageURI);
-                    //$scope.lastPhoto = imageURI;
-                    Camera.toBase64Image(imageURI).then(function (resp) { 
-                        dataImg = {
-                                  aire_id: $scope.dataPlayground.id,
-                                  img64: resp.imageData,
-                                  imageURI: imageURI
-                                };
-                        $scope.showConfirm(dataImg);        
-                    });
+                    var options = {
+                    quality: 40,
+                    destinationType: Camera.DestinationType.DATA_URL,
+                    encodingType: Camera.EncodingType.JPEG,
+                    targetWidth: 500,
+                    targetHeight: 280,
+                    popoverOptions: CameraPopoverOptions,
+                    saveToPhotoAlbum: false
+                  };
 
-                }, function (err) {
-                    console.err(err);
-                });
+                  $cordovaCamera.getPicture(options).then(function(imageData) {
+                      dataImg = {
+                                  aire_id: $scope.dataPlayground.id,
+                                  img64: imageData
+                                };
+                        $scope.showConfirm(dataImg); 
+                  }, function(err) {
+                      alert(err);
+                    console.log(err);
+                  });
                 }
             };
             
@@ -449,9 +520,6 @@ angular.module('starter.controllers', [])
                             confirmPopup.then(function(res) {
                               if(res) {
                                 console.log('ok photo');
-                                //$scope.lastPhoto = dataImg.imageURI;
-                                //$scope.playgroundData.img64 = resp.imageData;
-                                
                                 //send image                                
                                 Playgrounds.changePicture(dataImg, {"X-WSSE": sessionStorage.getItem('token')}).then(function (resp) {})
                                 .finally(function () {
@@ -471,16 +539,14 @@ angular.module('starter.controllers', [])
             $scope.doRefresh = function (playgroundId) {
                 //$scope.dataPlayground = [];
                 Playgrounds.getPlaygroundById(playgroundId).then(function (result) {
-                    //$scope.dataPlayground = result;
-                    //$scope.dataPlayground.img_name = ($scope.dataPlayground.file_name ? $rootScope.img_url + '500-'+ $scope.dataPlayground.file_name : 'img/imagedefaut.png');
-                    $scope.$broadcast('scroll.refreshComplete');
+                   $scope.$broadcast('scroll.refreshComplete');
                 }).finally(function () {$state.go($state.current, {playgroundId:$scope.dataPlayground.id}, {reload:true});});
             };
         })
 
         .controller('PlaygroundsCtrl', function ($scope, $rootScope, $stateParams, Playgrounds) {
             $scope.$on('$ionicView.beforeLeave', function (viewInfo, state) {
-                $rootScope.limitPlay = 8;
+                $rootScope.limitPlay = 15;
             });
             
             $scope.playgrounds = [];
@@ -493,54 +559,81 @@ angular.module('starter.controllers', [])
             });
         })
 
-        .controller('CitiesCtrl', function ($scope, $rootScope, $stateParams, Cities) {
+        .controller('CitiesCtrl', function ($scope, $rootScope, $stateParams, Cities, $ionicHistory) {
             //get cities
             $scope.cities = [];
+            $scope.cities_favorites = [];
             var zoneId = $stateParams.zoneId;
-
-            Cities.getCitiesByZone(zoneId).then(function (returnedData) {
+            
+            if ($ionicHistory.currentStateName() === 'tab.cities') {
+                Cities.getCitiesByZone(zoneId).then(function (returnedData) {
                 $scope.cities = returnedData;
-            });
-
+                });
+                
+                $scope.cities_favorites = Cities.getAllFavorites();
+            }
+            else{
+                Cities.getCitiesByFavorite().then(function (returnedData) {
+                $scope.cities_favorites = returnedData;
+                });
+            }
+            
             $scope.addCity = Cities.addCity;
 
             $scope.deleteCity = Cities.deleteCity;
 
             $scope.isFavorite = Cities.isFavorite;
+            
+            $scope.goBack = function () {
+                $ionicHistory.goBack();
+            };
         })
 
-        .controller('FavoritesCtrl', function ($scope, $rootScope, $stateParams, Favorites, $cordovaToast) {
-            $scope.$on('$ionicView.beforeEnter', function (viewInfo, state) {
-                if (localStorage.getItem('departs')) {
-                    $scope.favorites = JSON.parse(localStorage.getItem('departs'));
-                }
-                //$scope.doRefresh();
-            });
-
+        .controller('FavoritesCtrl', function ($scope, $rootScope, $stateParams, Favorites, $cordovaToast, $ionicScrollDelegate, $ionicPopover) {
+            
+            $scope.departs = [];
+            
+            data = JSON.parse(localStorage.getItem('departs'));
+                         
+            for (var i in data) {
+                $scope.departs[i]={
+                    id: data[i].id,
+                    'value': data[i].value,
+                    'code': data[i].code,
+                    'nom': data[i].nom
+                }                 
+            };
+            
             $scope.record = function () {
                 localStorage.setItem('favorites', JSON.stringify($scope.favorites));
                 $cordovaToast.show('Enregistrement réussi', 'short', 'center');
             };
 
             $scope.doRefresh = function () {
-                Favorites.getFavorites().then(function (returnedData) {
-                    $scope.favorites = returnedData;
+                Favorites.getDeparts().then(function (returnedData) {
+                    $scope.departs = returnedData;
                     localStorage.setItem('departs', JSON.stringify(returnedData));
                     $scope.$broadcast('scroll.refreshComplete');
                 }, function (error) {
                     console.error('get zones failed');
                     try {
-                        $scope.favorites = JSON.parse(localStorage.getItem('departs'));
+                        $scope.departs = JSON.parse(localStorage.getItem('departs'));
                     } catch (e) {
                         console.error("Exception: " + e);
                         return false;
                     }
                 });
             };
+                        
+            $ionicPopover.fromTemplateUrl('templates/favorite_popover.html', {
+                scope: $scope,
+              }).then(function(popover) {
+                $scope.popover = popover;
+            });
 
         })
 
-        .controller('CompteCtrl', function ($scope, $rootScope, $http, $cordovaInAppBrowser, $cordovaToast, $cordovaDialogs) {
+        .controller('CompteCtrl', function ($scope, $rootScope, $http, $cordovaToast, $cordovaDialogs, Account, $ionicModal, $timeout) {
 
             $scope.loginData = {};
 
@@ -587,28 +680,69 @@ angular.module('starter.controllers', [])
                     $cordovaDialogs.alert('Merci de renseigner votre login et votre mot de passe ', 'Erreur');
                 }
             };
+            
+            $scope.resetting = function() {
+                if ($scope.loginData.username && $scope.loginData.username != ''){
+                        Account.resetting($scope.loginData.username);
+                }                
+                else{
+                   $cordovaDialogs.alert('Merci de renseigner votre login ou votre email ', 'Erreur'); 
+                }
+            };
+            
+            
+            $scope.registerData = {};
+            $ionicModal.fromTemplateUrl('templates/register_modal.html', {
+                scope: $scope,
+                animation: 'slide-in-left',
+                hideDelay:1020,
+                focusFirstInput: true
+            }).then(function (modal) {
+                $scope.register_modal = modal;
+            });
 
-            $scope.openBrowser = function (url) {
-                $cordovaInAppBrowser.open(url, '_blank').then(function (event) {
-                    // success
-                }, function (event) {
-                    alert(event);
+            // Triggered in the comment modal to close it
+            $scope.closeRegister = function () {
+                $scope.register_modal.hide();                
+            };
+
+            // Open the comment modal
+            $scope.register = function () {
+                $scope.register_modal.show();
+            };
+
+            // Perform the register action when the user submits the register form
+            $scope.doRegister = function () {
+                console.log('Doing comment', $scope.registerData);
+                dataRegister = {
+                    username: $scope.registerData.username,
+                    email: $scope.registerData.email,
+                    password: $scope.registerData.password
+                };
+                console.log("add new user");
+                Account.register(dataRegister).then(function (resp) {
+                }).catch(function (err) {
+                }).finally(function () {
+                    $scope.register_modal.hide();
                 });
             };
         })
 
-        .controller('SearchCtrl', function ($scope, $rootScope, $http, $ionicPopup, Cities, $cordovaKeyboard, $ionicHistory) {
+        .controller('SearchCtrl', function ($scope, $rootScope, $http, $ionicPopup, Cities, $ionicHistory, $timeout) {
             $scope.dataSearch = {};
             $scope.cities_search = [];
             $scope.showPopup = function () {
                 $scope.dataSearch = [];
-                $cordovaKeyboard.show();
+                $timeout(function() {
+                if(window.cordova && window.cordova.plugins.Keyboard) {
+                    cordova.plugins.Keyboard.show();
+                }
+                }, 150);
                 var myPopup = $ionicPopup.show({
                     template: '<label class="item item-input">' +
-                            '<i class="icon ion-search placeholder-icon"></i><input type="search" ng-model="dataSearch.query" ng-keypress="searchByQuery(dataSearch.query)">' +
+                            '<i class="icon ion-search placeholder-icon"></i><input type="search" autofocus ng-model="dataSearch.query" ng-keypress="searchByQuery(dataSearch.query)">' +
                             '</label> ',
                     title: 'Entrer le nom d\'une ville',
-                    subTitle: 'les 3 premières lettres suffisent',
                     scope: $scope,
                     buttons: [
                         {text: 'Annuler',
@@ -619,6 +753,7 @@ angular.module('starter.controllers', [])
                             text: '<b>Rechercher</b>',
                             type: 'button-orange',
                             onTap: function (e) {
+                                cordova.plugins.Keyboard.close();
                                 if (!$scope.dataSearch.query) {
                                     e.preventDefault();
                                 } else {
@@ -631,7 +766,6 @@ angular.module('starter.controllers', [])
                 myPopup.then(function (res) {
                     Cities.searchCity(res).then(function (resp) {
                         $scope.cities_search = resp;
-                        //myPopup.close();
                     });
                     console.log('Resultat : ', res);
                 });

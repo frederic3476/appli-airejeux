@@ -1,0 +1,21 @@
+<ion-modal-view class="modal-parameter">
+  <ion-header-bar class="bar-calm">
+    <h1 class="title">Paramètres</h1>
+    <div class="buttons">
+      <div class="button button-clear" ng-click="closeParameter()"><span class="icon ion-close"></span></div>
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <form ng-submit="doParameter(distance)">
+      <div class="list">
+        <div class="item text-center">  
+            <span>Périmètre de recherche : <span>{{ distance }} km</span></span>
+        </div>
+        <div class="item range range-positive">  
+            <input class="my-range" type="range" name="score" min="2" max="20" step="1" value="2" ng-model="distance">
+        </div>
+        <button class="button button-block button-orange" type="submit">OK</button>
+      </div>
+    </form>
+  </ion-content>
+</ion-modal-view>

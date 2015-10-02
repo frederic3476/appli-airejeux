@@ -1,0 +1,26 @@
+<ion-view view-title="Vos villes favorites">
+  <ion-nav-buttons side="left">
+        <button class="button back-button buttons button-clear header-item" ng-click="goBack()">
+            <i class="icon ion-ios-arrow-back"></i>
+        </button>
+  </ion-nav-buttons>  
+  <ion-content> 
+      <ion-item> 
+            <img class="slide-hand" src="img/main.png"><h2 class="msg">Supprimer un favoris</h2>
+      </ion-item>
+      <ion-list>
+          <ion-item class="item-icon-right" ng-repeat="city in cities_favorites | orderObjectBy:'nom'" href="#/tab/playgrounds/{{ city.id }}">
+              <h2>{{city.nom}} <i class="code">{{city.code}}</i></h2>
+              <span class="badge badge-energized">
+                  <ng-pluralize count="city.value"
+                    when="{'0': '0 aire',
+                           'one': '1 aire',
+                           'other': '{} aires'}">
+                  </ng-pluralize>
+              </span>
+              <ion-option-button class="button button-assertive ion-minus-circled" ng-click="deleteCity(city.id)"></ion-option-button>
+              <i class="icon ion-chevron-right icon-accessory"></i>
+          </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

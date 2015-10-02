@@ -17,12 +17,13 @@
         </button>
     </ion-nav-buttons>
 
-    <ion-content class="has-footer"> 
+    <ion-content class="has-footer background-content"> 
         <ion-refresher
             pulling-text="Rafraichir..."
-            on-refresh="doRefresh(dataPlayground.id)">
+            on-refresh="doRefresh(dataPlayground.id)" 
+            refreshing-icon="">
         </ion-refresher>
-        <ion-slide-box on-slide-changed="slideChanged(index)">
+        <ion-slide-box show-pager="false">
             <ion-slide>
                 <div class="list card">
 

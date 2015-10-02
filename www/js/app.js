@@ -14,13 +14,16 @@ var GeoMarker;
 
 ionic.Platform.isFullScreen = true;
 
+
 angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'starter.services', 'starter.directives', 'ngCordova'])
 
 .run(function($ionicPlatform, $ionicLoading, $rootScope, $cordovaGeolocation, Favorites, $ionicPopup, $cordovaSplashscreen) {
+    
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
-    $cordovaSplashscreen.show();
+    //$cordovaSplashscreen.show();    
+    
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
     }
@@ -31,6 +34,10 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
     
     $rootScope.img_url = "http://www.airejeux.com/uploads/aires/";
     $rootScope.avatar_url = "http://www.airejeux.com/uploads/avatars/";
+    $rootScope.perimeter = 0.2;
+    $rootScope.latitude = 0;
+    $rootScope.longitude = 0;
+    $rootScope.limitPlay = 15;
     
     $rootScope.$on('loading:show', function() {
         $ionicLoading.show({template: '<ion-spinner class="spinner-energized" icon="android"></ion-spinner>',
@@ -41,13 +48,15 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
       $ionicLoading.hide();
     });
     
-    $rootScope.perimeter = 0.08;
-    $rootScope.latitude = 0;
-    $rootScope.longitude = 0;
-    $rootScope.limitPlay = 8;
+    //get departements
+    Favorites.getDeparts().then(function (returnedData) {
+                    localStorage.setItem('departs', JSON.stringify(returnedData));
+                }, function (error) {
+                    console.error('get zones failed');                  
+                }); 
     
      $rootScope.loadMore = function(){
-                $rootScope.limitPlay += 8;
+                $rootScope.limitPlay += 15;
                 //alert($rootScope.limit);
                 $rootScope.$broadcast('scroll.infiniteScrollComplete');
             };
@@ -106,22 +115,6 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
                     ]
                 });
    };
-    
-    //get zones
-    Favorites.getFavorites().then(function (returnedData) {
-                    $rootScope.favorites = returnedData;
-                }, function (error) {
-                    console.error('get zones failed');
-                    try {
-                        $rootScope.favorites = JSON.parse(localStorage.getItem('favorites'));
-                    } catch(e) {
-                        console.error("Exception: " + e);
-                        return false;
-                    }                    
-                });
-                
-        //map
-        
   });
 })
 
@@ -229,7 +222,17 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
         controller: 'CompteCtrl'
       }
     }
-  });
+  })
+  
+  .state('city_favorite', {
+      url: '/city_favorite',
+      abstract: false,
+      cache: false,
+      templateUrl: "templates/city_favorite.html",
+      controller: 'CitiesCtrl'
+    })
+    
+    ;
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/map');

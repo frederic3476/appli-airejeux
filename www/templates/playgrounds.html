@@ -1,9 +1,4 @@
 <ion-view view-title="Liste des aires">
-    <ion-nav-buttons side="right"> 
-        <a class="button button-icon icon ion-search"
-                href="#/tab/search">
-        </a>
-  </ion-nav-buttons> 
     <ion-content> 
         <ion-list>
             <ion-item class="item-thumbnail-left item-icon-right" ng-repeat="playground in playgrounds | limitTo: limitPlay" nav-transition="android" href="#/playground/{{ playground.id}}">             

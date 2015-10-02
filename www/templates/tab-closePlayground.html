@@ -6,7 +6,10 @@
     </ion-nav-buttons> 
     <ion-content> 
         <ion-list>
-            <ion-item class="item-thumbnail-left item-icon-right" ng-repeat="playground in close_playgrounds | orderObjectBy:'distanceKm':false | limitTo: limitPlay" href="#/playground/{{ playground.id}}">             
+            <ion-item class="item-thumbnail-left item-icon-right" 
+                      collection-repeat="playground in close_playgrounds | orderObjectBy:'distanceKm':false | limitTo: limitPlay" 
+                      href="#/playground/{{ playground.id}}"
+                      ng-show="playground.distanceKm<=distance">             
                 <img ng-src="img/thumbnail_defaut.png" loading-src="{{ playground.file_name?img_url+'100-'+playground.file_name: 'img/thumbnail_defaut.png' }}" imageonload />    
                 <div class="playground-body">
                     <h2>{{playground.nom|truncate_text:'21'}}</h2>
