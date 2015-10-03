@@ -10,7 +10,7 @@
       </ion-item>
       <ion-list>
           <ion-item class="item-icon-right" collection-repeat="city in cities_search" href="#/tab/playgrounds/{{ city.id }}">
-              <h2>{{city.nom}} - {{city.code}}<i class="ion-android-star" ng-if="isFavorite(city.id)"></i></h2>
+              <h2>{{city.nom}} <i class="code item-icon-right">{{city.code}}</i><i class="ion-android-star" ng-if="isFavorite(city.id)"></i></h2>
               <span class="badge badge-energized">
                   <ng-pluralize count="city.value"
                     when="{'0': '0 aire',

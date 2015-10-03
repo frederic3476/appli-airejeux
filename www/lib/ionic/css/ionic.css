@@ -17,10 +17,10 @@
   https://twitter.com/benjsperry  https://twitter.com/ionicframework
   MIT License: https://github.com/driftyco/ionicons
 
-  Android-style icons originally built by Googleâ€™s
+  Android-style icons originally built by Google’s
   Material Design Icons: https://github.com/google/material-design-icons
   used under CC BY http://creativecommons.org/licenses/by/4.0/
-  Modified icons to fit ioniconâ€™s grid from original.
+  Modified icons to fit ionicon’s grid from original.
 */
 @font-face {
   font-family: "Ionicons";
@@ -3103,7 +3103,8 @@ a.subdued {
     border-color: #0a9ec7;
     background-color: #11c1f3;
     background-image: linear-gradient(0deg, #0a9ec7, #0a9ec7 50%, transparent 50%);
-    color: #fff; }
+    color: #fff;
+    }
     .bar.bar-calm .title {
       color: #fff; }
     .bar.bar-calm.bar-footer {
@@ -4662,7 +4663,8 @@ ion-tabs.tabs-color-active-dark .tab-item {
   padding: 16px;
   border-width: 1px;
   border-style: solid;
-  font-size: 16px; }
+  font-size: 16px;
+  }
   .item h2 {
     margin: 0 0 2px 0;
     font-size: 16px;
@@ -5298,7 +5300,8 @@ a.item-content {
   padding-top: 1px;
   padding-bottom: 1px;
   padding-left: 0;
-  margin-bottom: 20px; }
+  margin-bottom: 12px;
+  }
 
 .list:last-child {
   margin-bottom: 0px; }
@@ -5355,7 +5358,8 @@ a.item-content {
     border-top-right-radius: 2px; }
 .card .item:last-child, .list-inset .item:last-child, .padding > .list .item:last-child {
   border-bottom-right-radius: 2px;
-  border-bottom-left-radius: 2px; }
+  border-bottom-left-radius: 2px;
+  }
   .card .item:last-child .item-content, .list-inset .item:last-child .item-content, .padding > .list .item:last-child .item-content {
     border-bottom-right-radius: 2px;
     border-bottom-left-radius: 2px; }
@@ -5435,11 +5439,14 @@ a.item-content {
 .slider {
   position: relative;
   visibility: hidden;
-  overflow: hidden; }
+  overflow: hidden;
+  /* height: 100%; */
+  }
 
 .slider-slides {
   position: relative;
-  height: 100%; }
+  height: 100%;
+  }
 
 .slider-slide {
   position: relative;
@@ -6346,18 +6353,58 @@ input[type="radio"][disabled], input[type="checkbox"][disabled], input[type="rad
     background: #ccc; }
 
 .range {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -moz-box;
-  display: -moz-flex;
-  display: -ms-flexbox;
+  display: 
+  
+  
+  
+  
+  
+  
+  
+  -webkit-box;
+  display: 
+  
+  
+  
+  
+  
+  
+  -webkit-flex;
+  display: 
+  
+  
+  
+  
+  
+  
+  
+  -moz-box;
+  display: 
+  
+  
+  
+  
+  
+  
+  
+  -moz-flex;
+  display: 
+  
+  
+  
+  
+  
+  
+  
+  -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
   -ms-flex-align: center;
   -webkit-align-items: center;
   -moz-align-items: center;
   align-items: center;
-  padding: 2px 11px; }
+  padding: 2px 11px;
+  }
   .range.range-light input::-webkit-slider-thumb:before {
     background: #ddd; }
   .range.range-light input::-ms-fill-lower {
@@ -6416,7 +6463,8 @@ input[type="radio"][disabled], input[type="checkbox"][disabled], input[type="rad
   flex: 1;
   display: block;
   margin-right: 10px;
-  margin-left: 10px; }
+  margin-left: 10px;
+  }
 
 .range-label {
   -webkit-box-flex: 0;

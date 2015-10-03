@@ -10,6 +10,10 @@ html, body{
     float:right;
 }
 
+.no-padding{
+    padding: 0;
+}
+
 .button-circle{
     border-top-left-radius: 50%;
     border-top-right-radius: 50%;
@@ -540,12 +544,19 @@ button-orange:hover{
 .wait-map{
     display: block;
     margin:0 auto;
+    /* padding: 3px; */
+}
+
+.wait-map .message {
+    padding-bottom: 20px;
 }
 
 .wait-map .message{
     /* padding-bottom: 14px; */
     /* margin-bottom: 20px; */
-    vertical-align: middle;
+    /* vertical-align: middle; */
+    padding-top: -20px;
+    /* margin-top: -12px; */
 }
 
 .message{
@@ -586,4 +597,8 @@ img.slide-hand{
 
 .item .msg{
     padding-left:100px;
+}
+
+.max-index{
+    z-index: 999;
 }

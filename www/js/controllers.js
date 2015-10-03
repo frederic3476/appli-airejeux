@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-        .controller('MapCtrl', function ($scope, $rootScope, $state, $ionicLoading, $ionicHistory, $ionicModal, 
+        .controller('MapCtrl', function ($scope, $rootScope, $state, $ionicLoading, $ionicModal, 
                                             $cordovaDialogs, $compile, Playgrounds, $cordovaSplashscreen, $ionicSlideBoxDelegate) {            
             var infowindow;
             var markers =[];
@@ -46,11 +46,16 @@ angular.module('starter.controllers', [])
             
             function initialize() {
                 
+                $ionicLoading.show({
+                    template: '<ion-spinner class="spinner max-index" icon="ios"></ion-spinner>',
+                    showBackDrop: true
+                });
                 
                 map = new google.maps.Map(document.getElementById("map"));
                 
                 google.maps.event.addListenerOnce(map, 'idle', function(){
                     //$cordovaSplashscreen.hide();
+                    $ionicLoading.hide();
                     $scope.message = "";
                     $scope.classSpinner = "hide";
                 });
