@@ -6,7 +6,7 @@
         </div>
     </ion-header-bar>
     <ion-content class="background-content" padding="true" style="background-color: #E3E0DB; padding:10px;">
-        <form ng-submit="doRegister()">
+        <form name="register_form" ng-submit="doRegister()">
             <div class="list">
                 <label class="item item-input">
                     <span class="input-label">Identifiant</span>
@@ -20,10 +20,22 @@
                     <span class="input-label">Mot de passe</span>
                     <input type="password" ng-model="registerData.password" required>
                 </label>  
-                <label class="item">
+                <label class="item item_compte_top">
                     <button class="button button-block button-orange" type="submit">Envoyer</button>
                 </label>
+                <input type="hidden" name="avatar64" ng-model="registerData.avatar64">  
+            </div>    
+        </form>  
+            <div class="list">
+                <ion-radio class="icon-left" ng-repeat="item in choiceList" 
+                   ng-value="item.value" 
+                   ng-model="data.choiceModel">
+                    <i class="icon {{ item.icon }}"></i>{{ item.text }}
+                </ion-radio>
+                <label class="item">                    
+                    <button class="button button-block button-orange" ng-click="getAvatar()">Choisir un avatar</button>
+                    <img id="avatar64" data-ng-src="{{lastAvatar}}" data-err-src="img/avatar_default.png" /> 
+                </label>
             </div>
-        </form>
     </ion-content>
 </ion-modal-view>

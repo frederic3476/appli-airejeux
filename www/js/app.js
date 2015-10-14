@@ -7,6 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 
 var api_url = "http://www.airejeux.com/api/";
+//var api_url = "http://localhost/airejeux/web/app_dev.php/api/";
 var icon = 'http://www.airejeux.com/bundles/applisunairejeux/images/playground-3.png';
 var new_icon = 'http://www.airejeux.com/bundles/applisunairejeux/images/playground.png';
 var map;
@@ -17,12 +18,12 @@ ionic.Platform.isFullScreen = true;
 
 angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'starter.services', 'starter.directives', 'ngCordova'])
 
-.run(function($ionicPlatform, $ionicLoading, $rootScope, $cordovaGeolocation, Favorites, $ionicPopup, $cordovaSplashscreen) {
+.run(function($ionicPlatform, $ionicLoading, $rootScope, Favorites, $ionicPopup, $cordovaSplashscreen, $ionicScrollDelegate) {
     
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
-    //$cordovaSplashscreen.show();    
+    //$cordovaSplashscreen.show();
     
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -39,6 +40,7 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
     $rootScope.longitude = 0;
     $rootScope.limitPlay = 15;
     
+    
     $rootScope.$on('loading:show', function() {
         $ionicLoading.show({template: '<ion-spinner class="spinner-energized" icon="android"></ion-spinner>',
             duration : 30000, noBackdrop:true, hideOnStateChange:true});
@@ -48,8 +50,13 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
       $ionicLoading.hide();
     });
     
+    $rootScope.$on('scroll:bottom', function(){
+        $ionicScrollDelegate.scrollBottom(true);
+    });
+    
     //get departements
     Favorites.getDeparts().then(function (returnedData) {
+                    localStorage.removeItem("departs");
                     localStorage.setItem('departs', JSON.stringify(returnedData));
                 }, function (error) {
                     console.error('get zones failed');                  
@@ -69,26 +76,6 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
                             $rootScope.close_playgrounds[i].distanceKm = parseFloat(MapUtils.getDistance(latLng).km);
                         }
             }  
-    
-    /*navigator.geolocation.getCurrentPosition(function(position){
-        alert('position ok');
-        $rootScope.latitude = position.coords.latitude;
-        $rootScope.longitude = position.coords.longitude;  
-        
-    }, function(error){
-        alert(error);
-    }, {maximumAge: 0, timeout: 15000, enableHighAccuracy: true});
-    
-      
-    //NEED this because of geolocation marker ?  
-    /*var watchId = navigator.geolocation.watchPosition( function(position){
-        console.log('position ok');
-        $rootScope.latitude = position.coords.latitude;
-        $rootScope.longitude = position.coords.longitude;
-    }, function(error){
-        alert(error);
-    }, {maximumAge: 1000, timeout: 20000, enableHighAccuracy: true});
-    */
    
    //popup for forbidden area
    $rootScope.showPopupLogin = function(){
@@ -118,12 +105,16 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
+  
+  $ionicConfigProvider.tabs.position('top');
+  $ionicConfigProvider.views.transition('ios');
+  
   $stateProvider
 
   // setup an abstract state for the tabs directive
@@ -157,6 +148,7 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
 
   .state('tab.add', {
       url: '/add',
+      cache: false,
       views: {
         'tab-add': {
           templateUrl: 'templates/tab-add.html',
@@ -196,6 +188,7 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
     
     .state('tab.favorites', {
     url: '/favorites',
+    cache: false,
     views: {
       'tab-favorites': {
         templateUrl: 'templates/tab-favorites.html',
@@ -216,6 +209,7 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
 
   .state('tab.compte', {
     url: '/compte',
+    cache: false,
     views: {
       'tab-compte': {
         templateUrl: 'templates/tab-compte.html',
@@ -224,12 +218,16 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
     }
   })
   
-  .state('city_favorite', {
+  .state('tab.city_favorite', {
       url: '/city_favorite',
       abstract: false,
       cache: false,
-      templateUrl: "templates/city_favorite.html",
-      controller: 'CitiesCtrl'
+      views: {
+        'tab-favorites': {
+            templateUrl: "templates/city_favorite.html",
+            controller: 'CitiesCtrl'
+        }
+    }
     })
     
     ;

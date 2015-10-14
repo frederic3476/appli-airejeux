@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-        .controller('MapCtrl', function ($scope, $rootScope, $state, $ionicLoading, $ionicModal, 
+        .controller('MapCtrl', function ($scope, $rootScope, $state, $ionicLoading, $ionicModal,
                                             $cordovaDialogs, $compile, Playgrounds, $cordovaSplashscreen, $ionicSlideBoxDelegate) {            
             var infowindow;
             var markers =[];
@@ -46,8 +46,10 @@ angular.module('starter.controllers', [])
             
             function initialize() {
                 
+                
                 $ionicLoading.show({
                     template: '<ion-spinner class="spinner max-index" icon="ios"></ion-spinner>',
+                    duration: 5000,
                     showBackDrop: true
                 });
                 
@@ -55,9 +57,14 @@ angular.module('starter.controllers', [])
                 
                 google.maps.event.addListenerOnce(map, 'idle', function(){
                     //$cordovaSplashscreen.hide();
-                    $ionicLoading.hide();
+                    //$ionicLoading.hide();
                     $scope.message = "";
                     $scope.classSpinner = "hide";
+                    
+                    setTimeout(function() {
+                        $cordovaSplashscreen.hide()
+                    }, 5000)
+                    
                 });
                     
                 navigator.geolocation.getCurrentPosition(function (pos) {
@@ -101,7 +108,6 @@ angular.module('starter.controllers', [])
                 }, {maximumAge: 60000, timeout: 30000, enableHighAccuracy: true});
                 
                 document.addEventListener("resume", function() {$scope.doRefresh();}, false);
-
             }
             
             ionic.Platform.ready(initialize);
@@ -306,38 +312,17 @@ angular.module('starter.controllers', [])
                     targetWidth: 500,
                     targetHeight: 280,
                     popoverOptions: CameraPopoverOptions,
+                    correctOrientation: true,
                     saveToPhotoAlbum: false
                   };
 
                   $cordovaCamera.getPicture(options).then(function(imageData) {
-                      alert(imageData);
                     $scope.lastPhoto = "data:image/jpeg;base64," + imageData;
                     $scope.playgroundData.img64 = imageData;
+                    $rootScope.$broadcast('scroll:bottom');
                   }, function(err) {
-                      alert(err);
                     console.log(err);
-                  });
-                
-                
-                /*Photo.getPicture({quality:40, 
-                                    targetWidth: 500, 
-                                    targetHeight: 500,
-                                    saveToPhotoAlbum: false, 
-                                    correctOrientation: true, 
-                                    destinationType: Camera.DestinationType.DATA_URL,
-                                    encodingType: Camera.EncodingType.JPEG,
-                                }).then(function (imageURI) {
-                                    console.log(imageURI);
-                                    alert('image   '+imageURI);
-                                    $scope.lastPhoto = "data:image/jpeg;base64," +imageURI;
-                                    $scope.playgroundData.img64 = imageURI;
-                                    /*Photo.toBase64Image(imageURI).then(function (resp) {
-                                        alert('image646464   '+resp.imageData);
-                                        $scope.playgroundData.img64 = resp.imageData;
-                                    });*/
-                //}, function (err) {
-                  //  console.err(err);
-                //});  */              
+                  });           
             };
 
 
@@ -360,10 +345,10 @@ angular.module('starter.controllers', [])
 
         .controller('PlaygroundCtrl', function ($scope, $rootScope, $stateParams, $ionicSlideBoxDelegate, $cordovaToast, 
                                                 $ionicModal, $cordovaDialogs, $ionicHistory, Playgrounds, $cordovaCamera,
-                                                $ionicPopup, $state, $cordovaSocialSharing) {            
+                                                $ionicPopup, $state, $cordovaSocialSharing, $ionicScrollDelegate) {            
             
             $scope.slideIndex = 0;
-            
+            $ionicScrollDelegate.resize();
             $scope.next = function () {
                 $ionicSlideBoxDelegate.next();
                 $scope.slideIndex = 1;
@@ -371,9 +356,12 @@ angular.module('starter.controllers', [])
             $scope.previous = function () {
                 $ionicSlideBoxDelegate.previous();
                 $scope.slideIndex = 0;
+                $ionicScrollDelegate.resize();
             };
             $scope.slideChanged = function (index) {
                 $scope.slideIndex = index;
+                $ionicSlideBoxDelegate.update();
+                $ionicScrollDelegate.scrollTop(true);
             };
 
             $scope.dataPlayground = [];
@@ -381,6 +369,8 @@ angular.module('starter.controllers', [])
             var playgroundId = $stateParams.playgroundId;
 
             $scope.dataPlayground = Playgrounds.get(playgroundId);
+            
+            $ionicSlideBoxDelegate.update();
 
             //modal vote
             $scope.voteData = {};
@@ -481,6 +471,7 @@ angular.module('starter.controllers', [])
                     quality: 40,
                     destinationType: Camera.DestinationType.DATA_URL,
                     encodingType: Camera.EncodingType.JPEG,
+                    correctOrientation: true,
                     targetWidth: 500,
                     targetHeight: 280,
                     popoverOptions: CameraPopoverOptions,
@@ -529,6 +520,7 @@ angular.module('starter.controllers', [])
                                 Playgrounds.changePicture(dataImg, {"X-WSSE": sessionStorage.getItem('token')}).then(function (resp) {})
                                 .finally(function () {
                                     $scope.doRefresh($scope.dataPlayground.id);
+                                    //TODO change src image and NOT refresh
                                 });
                               } else {
                                 console.log('not ok photo');
@@ -538,7 +530,12 @@ angular.module('starter.controllers', [])
             
 
             $scope.goBack = function () {
-                $ionicHistory.goBack();
+                if ($scope.slideIndex == 1){
+                    $scope.previous();
+                }
+                else{
+                    $ionicHistory.goBack();
+                }
             };
 
             $scope.doRefresh = function (playgroundId) {
@@ -564,7 +561,7 @@ angular.module('starter.controllers', [])
             });
         })
 
-        .controller('CitiesCtrl', function ($scope, $rootScope, $stateParams, Cities, $ionicHistory) {
+        .controller('CitiesCtrl', function ($scope, $stateParams, Cities, $ionicHistory) {
             //get cities
             $scope.cities = [];
             $scope.cities_favorites = [];
@@ -594,7 +591,7 @@ angular.module('starter.controllers', [])
             };
         })
 
-        .controller('FavoritesCtrl', function ($scope, $rootScope, $stateParams, Favorites, $cordovaToast, $ionicScrollDelegate, $ionicPopover) {
+        .controller('FavoritesCtrl', function ($scope, Favorites, $cordovaToast, $ionicPopover) {
             
             $scope.departs = [];
             
@@ -638,7 +635,7 @@ angular.module('starter.controllers', [])
 
         })
 
-        .controller('CompteCtrl', function ($scope, $rootScope, $http, $cordovaToast, $cordovaDialogs, Account, $ionicModal, $timeout) {
+        .controller('CompteCtrl', function ($scope, $http, $cordovaToast, $cordovaDialogs, Account, $ionicModal, $cordovaCamera) {
 
             $scope.loginData = {};
 
@@ -696,7 +693,7 @@ angular.module('starter.controllers', [])
             };
             
             
-            $scope.registerData = {};
+            $scope.registerData = {username:'', email:'', password:''};
             $ionicModal.fromTemplateUrl('templates/register_modal.html', {
                 scope: $scope,
                 animation: 'slide-in-left',
@@ -718,11 +715,13 @@ angular.module('starter.controllers', [])
 
             // Perform the register action when the user submits the register form
             $scope.doRegister = function () {
+                if (this.register_form.$valid){
                 console.log('Doing comment', $scope.registerData);
                 dataRegister = {
                     username: $scope.registerData.username,
                     email: $scope.registerData.email,
-                    password: $scope.registerData.password
+                    password: $scope.registerData.password,
+                    img64: $scope.registerData.avatar64
                 };
                 console.log("add new user");
                 Account.register(dataRegister).then(function (resp) {
@@ -730,10 +729,50 @@ angular.module('starter.controllers', [])
                 }).finally(function () {
                     $scope.register_modal.hide();
                 });
+                }
+                else{
+                   $cordovaDialogs.alert('Merci de remplir tous les champs', 'Erreur du formulaire');  
+                }
+                
+            };
+            
+            //$scope.lastAvatar = 'img/avatar_default.png';
+            /*var ctx = document.querySelector('#avatar').getContext('2d');
+            var img = new Image();
+            img.src = "img/avatar_default.png";
+            img.onload = function(){
+                ctx.drawImage(img, 0, 0);};*/
+            $scope.choiceList = [
+                { text: "Appareil photo", value: "0", icon:"ion-camera" },
+                { text: "Librairie", value: "1", icon:"ion-images" }
+              ];
+            $scope.data = { choiceModel: "1"};              
+            
+            $scope.lastAvatar = "img/avatar_default.png";
+            
+            $scope.getAvatar = function() {                
+                var options = {
+                    quality: 80,
+                    destinationType: Camera.DestinationType.DATA_URL,
+                    encodingType: Camera.EncodingType.JPEG,
+                    sourceType: ($scope.data.choiceModel == "0"? Camera.PictureSourceType.CAMERA: Camera.PictureSourceType.PHOTOLIBRARY),
+                    correctOrientation: true,
+                    targetWidth: 200,
+                    targetHeight: 200,
+                    popoverOptions: CameraPopoverOptions,
+                    saveToPhotoAlbum: false
+                  };
+
+                  $cordovaCamera.getPicture(options).then(function(imageData) {
+                     $scope.lastAvatar = "data:image/jpeg;base64," + imageData;
+                     $scope.registerData.avatar64 = imageData;
+                  }, function(err) {                      
+                    console.log(err);
+                  });
             };
         })
 
-        .controller('SearchCtrl', function ($scope, $rootScope, $http, $ionicPopup, Cities, $ionicHistory, $timeout) {
+        .controller('SearchCtrl', function ($scope, $ionicPopup, Cities, $ionicHistory, $timeout) {
             $scope.dataSearch = {};
             $scope.cities_search = [];
             $scope.showPopup = function () {

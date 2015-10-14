@@ -22,7 +22,7 @@ angular.module('starter.services', [])
                 method: "POST",
                 data: dataPost
             }).then(function(response){
-                $cordovaToast.show('Vous vou êtes enregistré avec succés !', 'short', 'center');
+                $cordovaToast.show('Vous vous êtes enregistré avec succés !', 'short', 'center');
                 return response;
             },function(error){                
                 $cordovaDialogs.alert(JSON.stringify(error.data), 'Erreur');  

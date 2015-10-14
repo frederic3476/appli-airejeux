@@ -6,7 +6,7 @@
   </ion-nav-buttons> 
   <ion-content> 
       <ion-item> 
-            <img class="slide-hand" src="img/main.png"><h2 class="msg">Ajouter/supprimer un favoris</h2>
+            <img class="slide-hand" src="img/main.png"><h2 class="msg">Ajouter/supprimer un favori</h2>
       </ion-item>
       <ion-list>
           <ion-item class="item-icon-right" collection-repeat="city in cities_search" href="#/tab/playgrounds/{{ city.id }}">
@@ -19,7 +19,7 @@
                   </ng-pluralize>
               </span>
               <ion-option-button class="button button-assertive ion-minus-circled" ng-click="deleteCity(city.id)" ng-if="isFavorite(city.id)"></ion-option-button>
-              <ion-option-button class="button button-balanced ion-plus-circled" ng-click="addCity(city.id)" ng-if="!isFavorite(city.id)"></ion-option-button>
+              <ion-option-button class="button button-balanced ion-plus-circled" ng-click="addCity(city)" ng-if="!isFavorite(city.id)"></ion-option-button>
               <i class="icon ion-chevron-right icon-accessory"></i>
           </ion-item>
     </ion-list>
