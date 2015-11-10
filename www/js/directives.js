@@ -63,7 +63,23 @@ angular.module('starter.directives', [])
                  }
              };
              
-          });  
+          })
+          
+        .directive('villeSelected', function(Cities) {
+            return {
+                restrict: 'E',
+                require: 'ngModel',
+                scope: { items: '=', val: '=ngModel'},
+                template:'<div><span ng-if="!finishSearch">Recherche en cours...</span>'+
+                    '<select ng-if="finishSearch" name="ville_str" ng-options="opt.id as opt.label for opt in options" ng-model="val" required>'+
+                    '</select></div>',
+                replace: true,
+                link: function(scope, element, attrs){
+                        scope.finishSearch = true;
+                    }
+                };
+        });
+  
 
         
 

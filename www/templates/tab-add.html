@@ -1,19 +1,30 @@
 <ion-view  cache-view="false" view-title="Ajouter une aire de jeux">
     <form name="addForm" novalidate ng-submit="addPlayground()">
     <ion-content class="has-footer"> 
-        
-            <div class="list"> 
+            <div class="list animated fadeInUp">
                 <label class="item item-input item-stacked-label">
-                    <span class="input-label">Nom</span>
+                    <span class="input-label">
+                        Nom
+                        <i class="icon ion-checkmark" ng-show="!addForm.nom.$error.required && !addForm.nom.$error.minlength"></i>
+                    </span>                    
                     <input name="nom" type="text" placeholder="Nom:" required ng-model="playgroundData.nom" ng-minlength="5">
                 </label>
-                <label class="item item-input item-select">
-                    <span class="input-label">Ville</span>
-                    <select name="ville_str" ng-model="playgroundData.ville_str" ng-options="opt.id as opt.label for opt in options" required>
-                    </select>
+                <label class="item item-input item-select item-add">
+                    <span class="input-label">
+                        Ville
+                        <i class="icon ion-checkmark" ng-show="!addForm.ville_str.$error.required"></i>
+                    </span>
+                    <div>
+                        <span ng-if="!finishSearch">Recherche en cours...</span>
+                        <select name="ville_str" ng-model="playgroundData.ville_str" ng-options="opt.id as opt.label for opt in options" required>
+                        </select>
+                    </div>    
                 </label>
-                <label class="item item-input item-select">
-                    <div class="input-label">Surface</div>
+                <label class="item item-input item-select item-add">
+                    <div class="input-label">
+                        Surface
+                        <i class="icon ion-checkmark" ng-show="!addForm.surface.$error.required"></i>
+                    </div>
                     <select name="surface" required ng-model="playgroundData.surface">
                                 <option value="synthétique">Synthétique</option>
                                 <option value="sable">Sable</option>
@@ -23,16 +34,15 @@
                                 <option value="gravier">Gravier</option>
                     </select>
                 </label>
-                <div class="row item range range-positive">  
+                <div class="row item range range-positive item-add">  
                     <div class="col-50">
                         <span class="input-label">Age minimum : <span id="age_min_value">{{playgroundData.age_min}}</span> ans</span>
                     </div>
                     <div class="col-50">
                         <input type="range" name="age_min" min="1" max="6" step="1" value="1" ng-model="playgroundData.age_min">
-                    </div>    
-                    
+                    </div> 
                 </div>
-                <div class="row item range range-positive">
+                <div class="row item range range-positive item-add">
                     <div class="col-50">
                         <span class="input-label">Age maximum : <span id="age_max_value">{{playgroundData.age_max}}</span> ans</span>
                     </div>    
@@ -41,7 +51,7 @@
                     </div>    
                     
                 </div>
-                <div class="row item range range-positive">
+                <div class="row item range range-positive item-add">
                     <div class="col-50">
                         <span class="input-label">Nombre de jeux : <span id="nbr_jeux_value">{{playgroundData.nbr_jeux}}</span></span>
                     </div>    
@@ -69,11 +79,8 @@
                 <div class="item item-input item-stacked-label">
                     <span class="input-label"> Votre photo :</span>
                     <img id="img64" data-ng-src="{{lastPhoto}}" data-err-src="img/imagedefaut.png" /> 
-                </div>    
+                </div> 
             </div>
-            
-        
-        
     </ion-content>
     <ion-footer-bar class="row bar-light has-tabs footer-large center">
         <div class="col col-33">

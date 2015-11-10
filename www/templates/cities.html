@@ -3,8 +3,11 @@
         <ion-item> 
             <img class="slide-hand" src="img/main.png"><h2 class="msg">Ajouter/supprimer un favori</h2>
         </ion-item>
+        <ion-item>
+            <input type="text" ng-model="$parent.search" placeholder="Nom ou code postal">
+        </ion-item>
         <ion-list>
-            <ion-item class="item-icon-right" ng-repeat="city in cities" href="#/tab/playgrounds/{{ city.id}}">
+            <ion-item class="item-icon-right" ng-repeat="city in cities | filter:search:startWith" href="#/tab/playgrounds/{{ city.id}}">
                 <h2>{{city.nom}} <i class="code item-icon-right">{{city.code}}</i><i class="ion-android-star" ng-if="isFavorite(city.id)"></i></h2>
                 <span class="badge badge-energized">
                     <ng-pluralize count="city.value"

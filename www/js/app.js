@@ -18,12 +18,26 @@ ionic.Platform.isFullScreen = true;
 
 angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'starter.services', 'starter.directives', 'ngCordova'])
 
-.run(function($ionicPlatform, $ionicLoading, $rootScope, Favorites, $ionicPopup, $cordovaSplashscreen, $ionicScrollDelegate) {
+.run(function($ionicPlatform, $ionicLoading, $rootScope, Favorites, $ionicPopup, $cordovaSplashscreen, $ionicScrollDelegate, $ionicPopup) {
     
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     //$cordovaSplashscreen.show();
+    
+    if(window.Connection) {
+                if(navigator.connection.type == Connection.NONE) {
+                    $ionicPopup.confirm({
+                        title: "Internet",
+                        content: "Aucun réseau disponible"
+                    })
+                    .then(function(result) {
+                        if(!result) {
+                            ionic.Platform.exitApp();
+                        }
+                    });
+                }
+    }    
     
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -53,6 +67,11 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
     $rootScope.$on('scroll:bottom', function(){
         $ionicScrollDelegate.scrollBottom(true);
     });
+    
+    $rootScope.startWith = function (actual, expected) {
+        var lowerStr = (actual + "").toLowerCase();
+        return lowerStr.indexOf(expected.toLowerCase()) === 0;
+    }
     
     //get departements
     Favorites.getDeparts().then(function (returnedData) {

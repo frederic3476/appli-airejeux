@@ -23,13 +23,13 @@
                 <i class="icon ion-chevron-right icon-accessory"></i>
             </ion-item>
         </ion-list>
+        <p ng-show="close_playgrounds.length==0">Aucune aire proche de votre position</p>
         <ion-infinite-scroll
             ng-if="limitPlay <= close_playgrounds.length"
             icon="android"
             on-infinite="loadMore()"
             distance="5%">
         </ion-infinite-scroll>
-        <p ng-show="close_playgrounds.length==0">Aucune aire proche de votre position</p>
     </ion-content>
     <distance></distance>
 </ion-view>    

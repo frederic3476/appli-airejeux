@@ -104,8 +104,16 @@ angular.module('starter.controllers', [])
 
                     $rootScope.map = map;
                 }, function (error) {
+                    //center to paris
+                    var mapOptions = {
+                        center: new google.maps.LatLng(48.857482, 2.349272),
+                        zoom: 12,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP,
+                        minZoom: 12
+                    };
+                    map.setOptions(mapOptions);   
                     $cordovaDialogs.alert(error.message, 'Erreur de localisation');
-                }, {maximumAge: 60000, timeout: 30000, enableHighAccuracy: true});
+                }, {maximumAge: 60000, timeout: 20000, enableHighAccuracy: true});
                 
                 document.addEventListener("resume", function() {$scope.doRefresh();}, false);
             }
@@ -234,11 +242,11 @@ angular.module('starter.controllers', [])
             $scope.$on('$ionicView.afterEnter', function (viewInfo, state) {
                 if (!sessionStorage.getItem('token')) {
                     //TODO : add button to go to account or use broadcast $rootScope.broadcast("interdiction");
-                    $cordovaDialogs.alert('Vous devez être identifié pour ajouter une aire de jeux !', 'Interdiction');
-                    $state.go('tab.compte');
+                    $cordovaDialogs.alert('Vous devez être identifié pour ajouter une aire de jeux !', 'Interdiction').then(function(){$state.go('tab.compte');});
+                    
                 }
                 else {
-                    //get closest cities
+                    //get closest cities by directive ville-selected
                     $scope.options = [];
 
                     Cities.getCloseCities().then(function (returnedData) {
@@ -247,7 +255,9 @@ angular.module('starter.controllers', [])
                                                 label: returnedData[i].nom, 
                                                 value: returnedData[i].nom + "|" + returnedData[i].code});
                         }
+                        $scope.finishSearch = true;
                     });
+                    $scope.finishSearch = false;
                 }
             });
 
@@ -306,11 +316,11 @@ angular.module('starter.controllers', [])
             //take picture
             $scope.getPhoto = function () {
                 var options = {
-                    quality: 40,
+                    quality: 50,
                     destinationType: Camera.DestinationType.DATA_URL,
                     encodingType: Camera.EncodingType.JPEG,
                     targetWidth: 500,
-                    targetHeight: 280,
+                    targetHeight: 500,
                     popoverOptions: CameraPopoverOptions,
                     correctOrientation: true,
                     saveToPhotoAlbum: false
@@ -468,12 +478,12 @@ angular.module('starter.controllers', [])
                 }
                 else{
                     var options = {
-                    quality: 40,
+                    quality: 50,
                     destinationType: Camera.DestinationType.DATA_URL,
                     encodingType: Camera.EncodingType.JPEG,
                     correctOrientation: true,
                     targetWidth: 500,
-                    targetHeight: 280,
+                    targetHeight: 500,
                     popoverOptions: CameraPopoverOptions,
                     saveToPhotoAlbum: false
                   };
@@ -542,7 +552,8 @@ angular.module('starter.controllers', [])
                 //$scope.dataPlayground = [];
                 Playgrounds.getPlaygroundById(playgroundId).then(function (result) {
                    $scope.$broadcast('scroll.refreshComplete');
-                }).finally(function () {$state.go($state.current, {playgroundId:$scope.dataPlayground.id}, {reload:true});});
+                   $state.go($state.current, {playgroundId:playgroundId}, {reload:true});
+               });
             };
         })
 
@@ -566,17 +577,18 @@ angular.module('starter.controllers', [])
             $scope.cities = [];
             $scope.cities_favorites = [];
             var zoneId = $stateParams.zoneId;
+            $scope.search = '';
             
             if ($ionicHistory.currentStateName() === 'tab.cities') {
                 Cities.getCitiesByZone(zoneId).then(function (returnedData) {
-                $scope.cities = returnedData;
+                    $scope.cities = returnedData;
                 });
                 
                 $scope.cities_favorites = Cities.getAllFavorites();
             }
             else{
                 Cities.getCitiesByFavorite().then(function (returnedData) {
-                $scope.cities_favorites = returnedData;
+                    $scope.cities_favorites = returnedData;
                 });
             }
             
