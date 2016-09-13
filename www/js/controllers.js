@@ -20,6 +20,9 @@ angular.module('starter.controllers', [])
             $scope.$on('new-playground', function(event, args) { 
                console.log('new playground'); 
                $scope.doRefresh();
+               if (map){
+                        map.setCenter({lat: $rootScope.latitude, lng: $rootScope.longitude});
+                    }
                //todo push new playground and marker
             });
             
@@ -46,15 +49,13 @@ angular.module('starter.controllers', [])
             
             function initialize() {
                 
-                
-                $ionicLoading.show({
+                /*$ionicLoading.show({
                     template: '<ion-spinner class="spinner max-index" icon="ios"></ion-spinner>',
                     duration: 5000,
                     showBackDrop: true
-                });
-                
-                map = new google.maps.Map(document.getElementById("map"));
-                
+                });*/
+                $scope.$on('$ionicView.loaded', function (viewInfo, state) {
+                map = map || new google.maps.Map(document.getElementById("map"));
                 google.maps.event.addListenerOnce(map, 'idle', function(){
                     //$cordovaSplashscreen.hide();
                     //$ionicLoading.hide();
@@ -62,11 +63,11 @@ angular.module('starter.controllers', [])
                     $scope.classSpinner = "hide";
                     
                     setTimeout(function() {
-                        $cordovaSplashscreen.hide()
+                        //$cordovaSplashscreen.hide()
                     }, 5000)
                     
                 });
-                    
+                });
                 navigator.geolocation.getCurrentPosition(function (pos) {
                     $rootScope.latitude = pos.coords.latitude;
                     $rootScope.longitude = pos.coords.longitude;
@@ -105,6 +106,8 @@ angular.module('starter.controllers', [])
                     $rootScope.map = map;
                 }, function (error) {
                     //center to paris
+                    $rootScope.latitude = 48.857482;
+                    $rootScope.longitude = 2.349272;
                     var mapOptions = {
                         center: new google.maps.LatLng(48.857482, 2.349272),
                         zoom: 12,
@@ -115,13 +118,18 @@ angular.module('starter.controllers', [])
                     $cordovaDialogs.alert(error.message, 'Erreur de localisation');
                 }, {maximumAge: 60000, timeout: 20000, enableHighAccuracy: true});
                 
-                document.addEventListener("resume", function() {$scope.doRefresh();}, false);
+                document.addEventListener("resume", function() {
+                    if (map){
+                        map.setCenter({lat: $rootScope.latitude, lng: $rootScope.longitude});
+                    }
+                }, false);
             }
-            
             ionic.Platform.ready(initialize);
             
             $scope.clickMarker = function (playgroundId) {
                 $state.go('playground', {playgroundId: playgroundId});
+                window.plugins.nativepagetransitions.slide({"type": "slide","direction": "up", "androiddelay": 600, "duration": 700, "triggerTransitionEvent": '$ionicView.beforeEnter', // internal ionic-native-transitions option 
+                          "backInOppositeDirection": true}, function(){}, function(){});
                 infowindow.close();
             };
             
@@ -214,7 +222,6 @@ angular.module('starter.controllers', [])
                 clearMarkers();
                 markers = [];
             }
-            
             //modal window for parameters
             $ionicModal.fromTemplateUrl('templates/parameter_modal.html', {
                 scope: $scope
@@ -237,9 +244,9 @@ angular.module('starter.controllers', [])
                 setMarkers(map, distance);                
             };
         })
-        .controller('AddCtrl', function ($scope, $rootScope, $state, Playgrounds, Cities, $cordovaDialogs, $cordovaCamera) {      
+        .controller('AddCtrl', function ($scope, $rootScope, $state, Playgrounds, Cities, $cordovaDialogs, $cordovaCamera, MapUtils) {      
             
-            $scope.$on('$ionicView.afterEnter', function (viewInfo, state) {
+            $scope.$on('$ionicView.beforeEnter', function (viewInfo, state) {
                 if (!sessionStorage.getItem('token')) {
                     //TODO : add button to go to account or use broadcast $rootScope.broadcast("interdiction");
                     $cordovaDialogs.alert('Vous devez être identifié pour ajouter une aire de jeux !', 'Interdiction').then(function(){$state.go('tab.compte');});
@@ -247,7 +254,7 @@ angular.module('starter.controllers', [])
                 }
                 else {
                     //get closest cities by directive ville-selected
-                    $scope.options = [];
+                    /*$scope.options = [];
 
                     Cities.getCloseCities().then(function (returnedData) {
                         for (i in returnedData) {
@@ -257,7 +264,7 @@ angular.module('starter.controllers', [])
                         }
                         $scope.finishSearch = true;
                     });
-                    $scope.finishSearch = false;
+                    $scope.finishSearch = false;*/
                 }
             });
 
@@ -272,6 +279,10 @@ angular.module('starter.controllers', [])
             $scope.playgroundData.is_shadow = { "checked": false }; 
             $scope.playgroundData.img64 = "";
             $scope.lastPhoto = "";
+            MapUtils.getAdresse().then(function(returnData){
+                $scope.playgroundData.ville_str = returnData.ville+'|'+returnData.code;
+                $scope.playgroundData.ville = returnData.ville+' ('+returnData.code+')';
+            });
 
             $scope.addPlayground = function () {
                 message = "";

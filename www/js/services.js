@@ -445,14 +445,40 @@ angular.module('starter.services', [])
   
  }])
  
-.factory('MapUtils', function($rootScope) {
+.factory('MapUtils', function($q, $rootScope) {
     return {
         getDistance: function(latLng) {
             var myLatLng = new google.maps.LatLng($rootScope.latitude, $rootScope.longitude);
             var distance = google.maps.geometry.spherical.computeDistanceBetween(myLatLng, latLng);
             
             return {'distance':((distance/1000)>1?(distance/1000).toFixed(2)+' km': distance.toFixed(0)+ ' mètres'), 'km': (distance/1000).toFixed(2)};
-        }
+        },
+        getAdresse: function () {
+            var q = $q.defer();
+            var myLng = new google.maps.LatLng($rootScope.latitude, $rootScope.longitude);
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode( {'latLng': myLng},
+            function(results, status) {
+              if(status == google.maps.GeocoderStatus.OK) {
+                if(results[0]) {
+                   if (results[0].address_components[6] != undefined){ 
+                       
+                       q.resolve({'ville':results[0].address_components[2].short_name, 'code':results[0].address_components[6].short_name});
+                      //return results[0].address_components[2].short_name+'|'+results[0].address_components[6].short_name;
+                   }
+                }
+                else {
+                    q.reject("No results");
+                  //return "No results";
+                }
+              }
+              else {
+                q.reject("No results");
+                //return status;
+              }
+            });
+            return q.promise;
+          }
     };
  });
 

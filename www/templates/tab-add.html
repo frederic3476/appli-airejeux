@@ -2,23 +2,24 @@
     <form name="addForm" novalidate ng-submit="addPlayground()">
     <ion-content class="has-footer"> 
             <div class="list animated fadeInUp">
-                <label class="item item-input item-stacked-label">
+                <label class="item item-input item-stacked-label">                    
                     <span class="input-label">
                         Nom
                         <i class="icon ion-checkmark" ng-show="!addForm.nom.$error.required && !addForm.nom.$error.minlength"></i>
                     </span>                    
                     <input name="nom" type="text" placeholder="Nom:" required ng-model="playgroundData.nom" ng-minlength="5">
                 </label>
-                <label class="item item-input item-select item-add">
+                <label class="item item-input item-stacked-label">
                     <span class="input-label">
-                        Ville
+                        Ville : {{ playgroundData.ville }}
                         <i class="icon ion-checkmark" ng-show="!addForm.ville_str.$error.required"></i>
                     </span>
-                    <div>
+                    <!--<div>
                         <span ng-if="!finishSearch">Recherche en cours...</span>
                         <select name="ville_str" ng-model="playgroundData.ville_str" ng-options="opt.id as opt.label for opt in options" required>
                         </select>
-                    </div>    
+                    </div>-->
+                    <input name="ville_str" type="hidden" required ng-model="playgroundData.ville_str">
                 </label>
                 <label class="item item-input item-select item-add">
                     <div class="input-label">
@@ -34,30 +35,42 @@
                                 <option value="gravier">Gravier</option>
                     </select>
                 </label>
-                <div class="row item range range-positive item-add">  
-                    <div class="col-50">
-                        <span class="input-label">Age minimum : <span id="age_min_value">{{playgroundData.age_min}}</span> ans</span>
+                <label class="item item-input item-select item-add">  
+                    <div class="input-label">
+                        Age minimum
                     </div>
-                    <div class="col-50">
-                        <input type="range" name="age_min" min="1" max="6" step="1" value="1" ng-model="playgroundData.age_min">
-                    </div> 
-                </div>
-                <div class="row item range range-positive item-add">
-                    <div class="col-50">
-                        <span class="input-label">Age maximum : <span id="age_max_value">{{playgroundData.age_max}}</span> ans</span>
-                    </div>    
-                    <div class="col-50">    
-                        <input type="range" name="age_max" min="6" max="15" step="1" value="6" ng-model="playgroundData.age_max">
-                    </div>    
-                    
-                </div>
-                <div class="row item range range-positive item-add">
-                    <div class="col-50">
-                        <span class="input-label">Nombre de jeux : <span id="nbr_jeux_value">{{playgroundData.nbr_jeux}}</span></span>
-                    </div>    
-                    <div class="col-50">    
-                        <input type="range" name="nbr_jeux" min="1" max="20" step="1" value="1" ng-model="playgroundData.nbr_jeux">
-                    </div>                        
+                        <!--<input type="range" name="age_min" min="1" max="6" step="1" value="1" ng-model="playgroundData.age_min">-->
+                        <select name="age_min" ng-model="playgroundData.age_min">
+                                <option value=1>1 ans</option>
+                                <option value=2>2 ans</option>
+                                <option value=3>3 ans</option>
+                                <option value=4>4 ans</option>
+                                <option value=5>5 ans</option>
+                                <option value=6>6 ans</option>
+                        </select>
+                </label>
+                <label class="item item-input item-select item-add">
+                    <div class="input-label">
+                        Age maximum
+                    </div>      
+                        <!--<input type="range" name="age_max" min="6" max="15" step="1" value="6" ng-model="playgroundData.age_max">-->
+                        <select name="age_max" ng-model="playgroundData.age_max">
+                                <option value=6>6 ans</option>
+                                <option value=7>7 ans</option>
+                                <option value=8>8 ans</option>
+                                <option value=9>9 ans</option>
+                                <option value=10>10 ans</option>
+                                <option value=11>11 ans</option>
+                                <option value=12>12 ans</option>
+                                <option value=13>13 ans</option>
+                                <option value=14>14 ans</option>
+                                <option value=15>15 ans</option>
+                        </select>
+                </label>
+                <div class="item item-input item-select item-add">
+                    Nombre de jeux
+                    <!--<input type="range" name="nbr_jeux" min="1" max="20" step="1" value="1" ng-model="playgroundData.nbr_jeux">-->
+                    <select name="nbr_jeux" ng-options="option as option for option in [1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" ng-model="playgroundData.nbr_jeux"></select>                    
                 </div>
                 <ion-toggle ng-model="playgroundData.is_picnic.checked" ng-checked="playgroundData.is_picnic.checked">
                         Aire de pique-nique

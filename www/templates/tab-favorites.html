@@ -9,7 +9,7 @@
         refreshing-icon="">
       </ion-refresher>
     <ion-list>
-        <ion-item class="item-icon-right" collection-repeat="depart in departs" ng-show="depart.value !=0" href="#/tab/cities/{{ depart.id }}">
+        <ion-item class="item-icon-right" collection-repeat="depart in departs" ng-show="depart.value !=0" href="#/tab/cities/{{ depart.id }}"  transitiontype="slide" direction="left" go-native>
             <h2>{{depart.nom}} <i class="code">{{depart.code}}</i></h2>
             <span class="badge badge-energized">
                 <ng-pluralize count="depart.value"

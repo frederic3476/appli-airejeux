@@ -9,10 +9,10 @@
     <form ng-submit="doVote()">
       <div class="list">
         <div class="item">  
-            <span class="input-label">Votre note : <span>{{voteData.score}}</span> /5</span>
+            <img ng-src="img/vote-{{ voteData.score }}.svg" />
         </div>    
         <div class="item range range-positive">                 
-            <input type="range" name="score" min="0.5" max="5" step="0.5" value="1" ng-model="voteData.score">
+            <input type="range" name="score" min="0.5" max="5" step="0.5" value="2.5" ng-model="voteData.score">
         </div>
         <button class="button button-block button-orange" type="submit">Noter</button>
       </div>

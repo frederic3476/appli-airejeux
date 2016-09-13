@@ -1,7 +1,7 @@
 <ion-view view-title="Liste des aires">
     <ion-content> 
         <ion-list>
-            <ion-item class="item-thumbnail-left item-icon-right" ng-repeat="playground in playgrounds | limitTo: limitPlay" nav-transition="android" href="#/playground/{{ playground.id}}">             
+            <ion-item class="item-thumbnail-left item-icon-right" ng-repeat="playground in playgrounds | limitTo: limitPlay" nav-transition="android" href="#/playground/{{ playground.id}}"  transitiontype="slide" direction="left" delay="600" duration="700" go-native>             
                 <img ng-src="img/thumbnail_defaut.png" loading-class="thumbnail" loading-src="{{ playground.file_name?img_url+'100-'+playground.file_name: 'img/thumbnail_defaut.png' }}" imageonload />    
                 <h2>{{playground.nom}}</h2>
                 <span class="note_playground_list">
