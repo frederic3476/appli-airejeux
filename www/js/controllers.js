@@ -86,7 +86,7 @@ angular.module('starter.controllers', [])
                     
                     //watchPosition include
                     GeoMarker.setMap(map);
-                    
+                        
                     map.setOptions(mapOptions); 
                     
                     google.maps.event.addListener(GeoMarker, 'position_changed', function () {    
@@ -128,7 +128,7 @@ angular.module('starter.controllers', [])
             
             $scope.clickMarker = function (playgroundId) {
                 $state.go('playground', {playgroundId: playgroundId});
-                window.plugins.nativepagetransitions.slide({"type": "slide","direction": "up", "androiddelay": 600, "duration": 700, "triggerTransitionEvent": '$ionicView.beforeEnter', // internal ionic-native-transitions option 
+                window.plugins.nativepagetransitions.slide({"type": "slide","direction": "up", "androiddelay": 800, "duration": 600, "triggerTransitionEvent": '$ionicView.beforeEnter', // internal ionic-native-transitions option 
                           "backInOppositeDirection": true}, function(){}, function(){});
                 infowindow.close();
             };

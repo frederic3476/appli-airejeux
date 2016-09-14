@@ -4,7 +4,7 @@
             <img class="slide-hand" src="img/main.png"><h2 class="msg">Supprimer un favori</h2>
       </ion-item>
       <ion-list>
-          <ion-item class="item-icon-right" ng-repeat="city in cities_favorites | orderObjectBy:'nom'" href="#/tab/playgrounds/{{ city.id }}">
+          <ion-item class="item-icon-right" ng-repeat="city in cities_favorites | orderObjectBy:'nom'" href="#/tab/playgrounds/{{ city.id }}" transitiontype="slide" direction="left" go-native>
               <h2>{{city.nom}} <i class="code">{{city.code}}</i></h2>
               <span class="badge badge-energized">
                   <ng-pluralize count="city.value"

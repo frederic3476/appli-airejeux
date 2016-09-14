@@ -133,7 +133,8 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
   // Each state's controller can be found in controllers.js
   
   $ionicConfigProvider.tabs.position('top');
-  $ionicConfigProvider.views.transition('ios');
+  $ionicConfigProvider.views.transition('none');
+  $ionicConfigProvider.scrolling.jsScrolling(false);
   
   $stateProvider
 
@@ -289,11 +290,6 @@ angular.module('starter', ['ionic', 'ionicLazyLoad', 'starter.controllers', 'sta
     };
         });
     }
-])
-.config(['$ionicConfigProvider', function($ionicConfigProvider) {        
-        $ionicConfigProvider.views.transition('none');
-        $ionicConfigProvider.scrolling.jsScrolling(false);
-}
 ])
 /*.config(['$ionicNativeTransitionsProvider',function($ionicNativeTransitionsProvider){
     $ionicNativeTransitionsProvider.setDefaultOptions({

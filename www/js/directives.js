@@ -112,7 +112,8 @@ angular.module('starter.directives', [])
                           "direction": direction,
                           "androiddelay": delay,
                           "duration": duration,
-                          "triggerTransitionEvent": '$ionicView.beforeEnter', // internal ionic-native-transitions option 
+                          "slowdownfactor": 4,
+                          "triggerTransitionEvent": '$ionicView.afterEnter', // internal ionic-native-transitions option 
                           "backInOppositeDirection": true
                         },
                         function(msg) {
